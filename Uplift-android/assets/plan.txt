@@ -1,0 +1,3 @@
+KAMA: A sparsely populated planet, with a high temperature due to its proximity to Tor.
+PERR: A gas giant, used by the Red military as a fuel source.
+SENTINEL: This space station acts as the headquarters of the Red military.
