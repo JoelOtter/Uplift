@@ -9,7 +9,7 @@ import es.bearwav.uplift.screen.Screen;
 
 public class GdxGame implements ApplicationListener {
 	
-	public static OrthographicCamera camera;
+	public OrthographicCamera camera;
 	private Stats stats;
 	private Input input;
 	private Screen screen;

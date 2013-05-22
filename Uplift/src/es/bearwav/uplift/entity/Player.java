@@ -26,6 +26,7 @@ public class Player extends Entity {
 	@Override
 	public void render(Screen screen, Camera cam) {
 		this.x += 1f;
+		this.y += 1f;
 		screen.draw(down, x, y);
 	}
 	

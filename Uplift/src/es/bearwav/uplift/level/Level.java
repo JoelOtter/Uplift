@@ -136,6 +136,7 @@ public class Level {
 	 
 	 public void fixCamera(){
 		 cam.position.set(player.getX() + player.getWidth()/2, player.getY() + player.getHeight()/2, 0);
+		 cam.update();
 		 if (!isSpace){
 			 if (cam.frustum.boundsInFrustum(leftBound) && cam.frustum.boundsInFrustum(rightBound)){
 				 cam.position.x = (rightBound.min.x - leftBound.max.x)/2;
