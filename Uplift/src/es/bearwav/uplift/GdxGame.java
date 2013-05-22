@@ -21,7 +21,6 @@ public class GdxGame implements ApplicationListener {
 
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, w, h);
-		camera.zoom = 5f;
 		camera.update();
 
 		stats = new Stats(100, 0, 0);
@@ -40,6 +39,8 @@ public class GdxGame implements ApplicationListener {
 
 	@Override
 	public void resize(int width, int height) {
+		camera.setToOrtho(false, width, height);
+		camera.update();
 	}
 
 	@Override

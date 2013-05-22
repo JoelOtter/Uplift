@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 
 import es.bearwav.uplift.screen.Screen;
 
-public class Block extends Entity{
+public class Door extends Entity{
 	
 	private ShapeRenderer shapeRenderer;
 	private float x;
@@ -14,7 +14,7 @@ public class Block extends Entity{
 	private float w;
 	private float h;
 
-	public Block(float x, float y, float w, float h) {
+	public Door(float x, float y, float w, float h) {
 		super(x, y, w, h);
 		shapeRenderer = new ShapeRenderer();
 		this.x = x;
@@ -27,11 +27,9 @@ public class Block extends Entity{
 	public void render(Screen screen, Camera cam) {
 		shapeRenderer.setProjectionMatrix(cam.combined);
 		shapeRenderer.begin(ShapeType.Filled);
-		shapeRenderer.setColor(0, 1, 0, 1);
+		shapeRenderer.setColor(0, 0, 1, 1);
 		shapeRenderer.rect(x, y, w, h);
 		shapeRenderer.end();
-		cam.translate(0.001f, 0.001f, 0);
-		cam.update();
 	}
 
 }
