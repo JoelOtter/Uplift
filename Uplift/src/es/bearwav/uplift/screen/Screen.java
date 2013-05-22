@@ -14,7 +14,6 @@ public abstract class Screen {
 	public void init(GdxGame game){
 		this.game = game;
 		spriteBatch = new SpriteBatch(10);
-		spriteBatch.setProjectionMatrix(game.getCam().combined);
 	}
 	
 	public void remove(){
@@ -27,7 +26,7 @@ public abstract class Screen {
 		
 	}
 	
-	public void draw(TextureRegion tr, int x, int y){
+	public void draw(TextureRegion tr, float x, float y){
 		spriteBatch.draw(tr, x, y, tr.getRegionWidth(), tr.getRegionHeight());
 	}
 	

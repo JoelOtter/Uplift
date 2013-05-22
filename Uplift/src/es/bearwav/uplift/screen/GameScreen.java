@@ -8,10 +8,6 @@ public class GameScreen extends Screen{
 	
 	private Level level;
 	
-	public GameScreen(){
-		level = new Level("tmx/desert.tmx", this, GdxGame.camera);
-	}
-	
 	@Override
 	public void render() {
 		level.render();
@@ -22,6 +18,16 @@ public class GameScreen extends Screen{
 	@Override
 	public void tick(Input input){
 		level.tick(input);
+	}
+	
+	public void remove(){
+		super.remove();
+		level.remove();
+	}
+	
+	public void init(GdxGame game){
+		super.init(game);
+		level = new Level("tmx/desert.tmx", this, game.getCam());
 	}
 
 }

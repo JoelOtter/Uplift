@@ -7,16 +7,14 @@ import es.bearwav.uplift.screen.Screen;
 
 public abstract class Entity {
 	
-	private float x;
-	private float y;
-	private float w;
-	private float h;
+	protected float x;
+	protected float y;
+	protected int w;
+	protected int h;
 	
-	public Entity(float x, float y, float w, float h){
+	public Entity(float x, float y){
 		this.x = x;
 		this.y = y;
-		this.w = w;
-		this.h = h;
 	}
 	
 	public abstract void render(Screen screen, Camera cam);
@@ -36,5 +34,9 @@ public abstract class Entity {
 	public float getY() { return y; }
 	public float getWidth() { return w; }
 	public float getHeight() { return h; }
+	
+	public void remove(){
+		
+	}
 	
 }
