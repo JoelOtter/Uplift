@@ -76,7 +76,6 @@ public class Level {
 		 map = new TmxMapLoader().load(tmxMap);
 		 renderer = new OrthogonalTiledMapRenderer(map, 1f);
 		 TiledMapTileLayer tilesLayer = (TiledMapTileLayer) map.getLayers().get(2);
-		 System.out.println(tilesLayer.toString());
 		 Vector2 min = new Vector2(0, 0);
 		 Vector2 max = new Vector2(tilesLayer.getWidth() * tilesLayer.getTileWidth(),
 				 tilesLayer.getHeight() * tilesLayer.getTileHeight());
@@ -146,7 +145,6 @@ public class Level {
 			 }
 			 else if (cam.frustum.boundsInFrustum(leftBound)){
 				 cam.position.x = leftBound.max.x + cam.viewportWidth/2;
-				 System.out.println(leftBound.max.x);
 			 }
 			 if (cam.frustum.boundsInFrustum(topBound) && cam.frustum.boundsInFrustum(bottomBound)){
 				 cam.position.y = (topBound.min.y - bottomBound.max.y)/2;

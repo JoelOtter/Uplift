@@ -25,6 +25,8 @@ public class GdxGame implements ApplicationListener {
 
 		stats = new Stats(100, 0, 0);
 		setScreen(new GameScreen());
+		input = new Input();
+		Gdx.input.setInputProcessor(input);
 	}
 
 	@Override
@@ -34,6 +36,7 @@ public class GdxGame implements ApplicationListener {
 
 	@Override
 	public void render() {
+		screen.tick(input);
 		screen.render();
 	}
 
