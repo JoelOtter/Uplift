@@ -26,8 +26,8 @@ public abstract class Screen {
 		
 	}
 	
-	public void draw(TextureRegion tr, float x, float y){
-		spriteBatch.draw(tr, x, y, tr.getRegionWidth(), tr.getRegionHeight());
+	public void draw(TextureRegion tr, float x, float y, float w, float h){
+		spriteBatch.draw(tr, x, y, w, h);
 	}
 	
 }

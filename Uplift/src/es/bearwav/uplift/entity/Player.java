@@ -6,9 +6,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 
 import es.bearwav.uplift.Input;
+import es.bearwav.uplift.level.Level;
 import es.bearwav.uplift.screen.Screen;
 
 public class Player extends Entity {
@@ -32,9 +35,11 @@ public class Player extends Entity {
 	private Animation leftAnimation;
 	private Animation upAnimation;
 	private Animation downAnimation;
+	private static final float playerScale = 0.7f;
+	private static final float boundHeight = 0.3f;
 
-	public Player(float x, float y) {
-		super(x, y);
+	public Player(float x, float y, Level l) {
+		super(x, y, l);
 		velocity = new Vector2(0, 0);
 		playerTex = new Texture(Gdx.files.internal("gfx/playergrid.png"));
 		this.w = playerTex.getWidth() / 5;
@@ -49,7 +54,7 @@ public class Player extends Entity {
 		upFrames = new Array<TextureRegion>();
 		downFrames = new Array<TextureRegion>();
 		rightFrames = new Array<TextureRegion>();
-		for (int i = 0; i < 4; i++){
+		for (int i = 0; i < 4; i++) {
 			upFrames.add(tmp[0][i]);
 			rightFrames.add(tmp[1][i]);
 			leftFrames.add(tmp[2][i]);
@@ -62,12 +67,14 @@ public class Player extends Entity {
 		direction = 2;
 		stateTime = 0;
 		currentFrame = down;
+		bounds = new BoundingBox(new Vector3(x, y, 0), new Vector3(x
+				+ (w * playerScale), y + (h * playerScale * boundHeight), 0));
 	}
 
 	@Override
 	public void render(Screen screen, Camera cam) {
 		stateTime += Gdx.graphics.getDeltaTime();
-		screen.draw(currentFrame, x, y);
+		screen.draw(currentFrame, x, y, w * playerScale, h * playerScale);
 	}
 
 	public void remove() {
@@ -78,18 +85,19 @@ public class Player extends Entity {
 		velocity.x = 0;
 		velocity.y = 0;
 		if (input.keys[input.down])
-			walk(2);
+			velocity.y = -MAX_SPEED;
 		if (input.keys[input.up])
-			walk(0);
+			velocity.y = MAX_SPEED;
 		if (input.keys[input.left])
-			walk(3);
+			velocity.x = -MAX_SPEED;
 		if (input.keys[input.right])
-			walk(1);
+			velocity.x = MAX_SPEED;
 		if (velocity.x == 0 && velocity.y == 0)
 			stop();
-		
-		this.x += velocity.x;
-		this.y += velocity.y;
+		else
+			animate(calculateDirection());
+		updatePosition();
+		updateBounds();
 	}
 
 	private void stop() {
@@ -109,30 +117,54 @@ public class Player extends Entity {
 		}
 	}
 
-	private void walk(int dir) {
-		if (dir != direction) stateTime = 0;
-		
-		if (dir == 0) velocity.y = MAX_SPEED;
-		if (dir == 1) velocity.x = MAX_SPEED;
-		if (dir == 2) velocity.y = -MAX_SPEED;
-		if (dir == 3) velocity.x = -MAX_SPEED;
-		
-		if (velocity.y > 0){
+	private void animate(int dir) {
+		switch (dir) {
+		case 0:
 			currentFrame = upAnimation.getKeyFrame(stateTime);
-			direction = 0;
-		}
-		else if (velocity.y < 0){
-			currentFrame = downAnimation.getKeyFrame(stateTime);
-			direction = 2;
-		}
-		else if (velocity.x > 0){
+			break;
+		case 1:
 			currentFrame = rightAnimation.getKeyFrame(stateTime);
-			direction = 1;
-		}
-		else if (velocity.x < 0){
+			break;
+		case 2:
+			currentFrame = downAnimation.getKeyFrame(stateTime);
+			break;
+		case 3:
 			currentFrame = leftAnimation.getKeyFrame(stateTime);
-			direction = 3;
+			break;
 		}
+	}
+
+	private void updatePosition() {
+		float newX = x + velocity.x;
+		float newY = y + velocity.y;
+		BoundingBox newBounds = new BoundingBox(new Vector3(newX, newY, 0),
+				new Vector3(newX + (w * playerScale), newY
+						+ (h * boundHeight * playerScale), 0));
+		if ((l.checkCollision(newBounds) == null)){
+			x = newX;
+			y = newY;
+		}
+		else System.out.println(l.checkCollision(newBounds).toString());
+	}
+
+	private void updateBounds() {
+		bounds.min.x = x;
+		bounds.min.y = y;
+		bounds.max.x = x + w;
+		bounds.max.y = y + (h * playerScale * boundHeight);
+	}
+
+	private int calculateDirection() {
+		double angle = Math.toDegrees(Math.atan2(velocity.x, velocity.y));
+		if (Math.abs(angle) < 50)
+			direction = 0;
+		else if (Math.abs(angle) > 130)
+			direction = 2;
+		else if (angle > 0)
+			direction = 1;
+		else
+			direction = 3;
+		return direction;
 	}
 
 }
