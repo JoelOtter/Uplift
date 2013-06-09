@@ -35,7 +35,7 @@ public class Player extends Entity {
 	private Animation leftAnimation;
 	private Animation upAnimation;
 	private Animation downAnimation;
-	private static final float playerScale = 0.7f;
+	private static final float playerScale = 0.6f;
 	private static final float boundHeight = 0.3f;
 
 	public Player(float x, float y, Level l) {
