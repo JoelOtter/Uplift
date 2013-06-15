@@ -152,9 +152,10 @@ class NewEnemyDialog(Gtk.Dialog):
 class ConversationDialog(Gtk.Dialog):
 
     convs = None
+    selectedConv = None
 
     def __init__(self, parent):
-        self.convs = parent.selectedEnt[6][1]
+        self.convs = list(parent.selectedEnt[6][1])
         Gtk.Dialog.__init__(self, "Conversation Viewer", parent, 0,
             (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
              Gtk.STOCK_OK, Gtk.ResponseType.OK))
@@ -162,30 +163,99 @@ class ConversationDialog(Gtk.Dialog):
         self.box = self.get_content_area()
         self.tree = Gtk.TreeView(self.create_model())
         self.tree.set_rules_hint(True)
+        self.tree.get_selection().connect("changed", self.on_tree_selection_changed)
         self.create_columns(self.tree)
+        self.toolbar = Gtk.Toolbar()
+        self.toolbar.set_style(Gtk.ToolbarStyle.BOTH_HORIZ)
+        self.newbutton = Gtk.ToolButton(stock_id=Gtk.STOCK_NEW)
+        self.deletebutton = Gtk.ToolButton(stock_id=Gtk.STOCK_DELETE)
+        self.deletebutton.connect("clicked", self.delete_conv)
+        self.newbutton.set_expand(True)
+        self.newbutton.connect("clicked", self.new_conv)
+        self.deletebutton.set_expand(True)
+        self.deletebutton.set_sensitive(False)
+        self.toolbar.add(self.newbutton)
+        self.toolbar.add(self.deletebutton)
         self.box.pack_start(self.tree, True, True, 5)
+        self.box.pack_start(self.toolbar, False, False, 5)
         self.show_all()
 
     def create_model(self):
         listData = []
         for i in self.convs:
-            if i != []: listData.append(((i[0], i[1])))
-        store = Gtk.ListStore(int, str)
+            if i != []: listData.append(((i[0], i[1], i[2])))
+        store = Gtk.ListStore(int, str, str)
         for item in listData:
             store.append(item)
         return store
 
     def create_columns(self, treeView):
         rendererText = Gtk.CellRendererText()
-        rendererText.set_property('editable', True)
         column = Gtk.TreeViewColumn(">=", rendererText, text=0)
         column.set_sort_column_id(0)
         treeView.append_column(column)
-        rendererText = Gtk.CellRendererText()
-        column = Gtk.TreeViewColumn("Text", rendererText, text=1)
+        column = Gtk.TreeViewColumn("Post", rendererText, text=1)
         column.set_sort_column_id(1)
         treeView.append_column(column)
+        column = Gtk.TreeViewColumn("Text", rendererText, text=2)
+        column.set_sort_column_id(2)
+        treeView.append_column(column)
         treeView.columns_autosize()
+
+    def on_tree_selection_changed(self, selection):
+        model, treeiter = selection.get_selected()
+        if treeiter != None:
+            outp = []
+            for i in model[treeiter]:
+                outp.append(i)
+            self.selectedConv = outp
+            self.deletebutton.set_sensitive(True)
+
+    def delete_conv(self, widget):
+        self.convs.remove(self.selectedConv)
+        newmod = self.create_model()
+        self.tree.set_model(newmod)
+        self.deletebutton.set_sensitive(False)
+        self.show_all()
+
+    def new_conv(self, widget):
+        dialog = NewConvDialog(self)
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            viewbuf = dialog.textEntry.get_buffer()
+            text = viewbuf.get_text(viewbuf.get_start_iter(), viewbuf.get_end_iter(), include_hidden_chars=True)
+            self.convs.append([int(dialog.numEntry.get_text()), dialog.postEntry.get_text(), text])
+        dialog.destroy()
+        newmod = self.create_model()
+        self.tree.set_model(newmod)
+        self.show_all()
+
+class NewConvDialog(Gtk.Dialog):
+
+    def __init__(self, parent):
+        Gtk.Dialog.__init__(self, "New conversation option", parent, 0,
+            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+             Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        box = self.get_content_area()
+        self.set_size_request(400, 300)
+        numLabel = Gtk.Label(">=")
+        self.numEntry = Gtk.Entry()
+        postLabel = Gtk.Label("Post")
+        self.postEntry = Gtk.Entry()
+        numBox = Gtk.Box(spacing=5)
+        numBox.pack_start(numLabel, False, False, 5)
+        numBox.pack_start(self.numEntry, True, True, 5)
+        numBox.pack_start(postLabel, False, False, 5)
+        numBox.pack_start(self.postEntry, True, True, 5)
+        box.pack_start(numBox, False, False, 5)
+        scrolledwindow = Gtk.ScrolledWindow()
+        scrolledwindow.set_hexpand(True)
+        scrolledwindow.set_vexpand(True)
+        self.textEntry = Gtk.TextView()
+        self.textEntry.set_wrap_mode(Gtk.WrapMode.WORD_CHAR)
+        box.pack_start(scrolledwindow, True, True, 5)
+        scrolledwindow.add_with_viewport(self.textEntry)
+        self.show_all()
 
 class LevelWindow(Gtk.Window):
 
@@ -221,7 +291,7 @@ class LevelWindow(Gtk.Window):
         self.infoTitle = Gtk.Label("Title")
         self.infoTitle.set_alignment(0, 0)
         self.toolbar = Gtk.Toolbar()
-        self.toolbar.set_style(Gtk.ToolbarStyle.BOTH)
+        self.toolbar.set_style(Gtk.ToolbarStyle.BOTH_HORIZ)
         self.saveButton = Gtk.ToolButton(stock_id=Gtk.STOCK_SAVE, label="Save")
         self.saveButton.set_expand(True)
         self.saveButton.connect("clicked", self.save_button_clicked)
@@ -460,7 +530,7 @@ class LevelWindow(Gtk.Window):
         dialog = ConversationDialog(treeview)
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            print 'yay'
+            treeview.selectedEnt[6][1] = list(dialog.convs)
         dialog.destroy()
 
     def enemy_row_activated(treeview, iterr, path, data):
