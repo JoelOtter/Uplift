@@ -29,7 +29,6 @@ public class Input implements InputProcessor{
 	@Override
 	public boolean keyDown(int keycode) {
 		set(keycode, true);
-		System.out.println("Key pressed: " + Integer.toString(keycode));
 		return false;
 	}
 

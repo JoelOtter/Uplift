@@ -1,5 +1,9 @@
 package es.bearwav.uplift.level;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -14,6 +18,8 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
 
 import es.bearwav.uplift.Input;
 import es.bearwav.uplift.entity.Block;
@@ -38,17 +44,34 @@ public class Level {
 	private BoundingBox leftBound;
 	private BoundingBox rightBound;
 
-	public Level(String tmxMap, GameScreen s, OrthographicCamera cam) {
+	public Level(int num, int door, GameScreen s, OrthographicCamera cam) {
 		this.cam = cam;
 		this.screen = s;
 		entities = new ArrayList<Entity>();
-		if (tmxMap == "") {
-			isSpace = true;
-		} else {
-			isSpace = false;
-			buildTiles(tmxMap);
-			player = addEntity(new Player(900, 900, this));
+		try {
+			generateLevel(num, door);
+		} catch (IOException e) {
+			System.out.println("Couldn't load file.");
 		}
+		player = addEntity(new Player(900, 900, this));
+	}
+	
+	private void generateLevel(int num, int door) throws IOException{
+		//Get line from file
+		InputStream fs = Gdx.files.internal("levels.upl").read();
+		BufferedReader br = new BufferedReader(new InputStreamReader(fs));
+		for(int i = 0; i < num; ++i) br.readLine();
+		String levelLine = br.readLine();
+		System.out.println(levelLine);
+		
+		//Parse JSON
+		Json js = new Json();
+		ArrayList<?> levelData = js.fromJson(ArrayList.class, levelLine);
+		String tiles = "tmx/" + (String) levelData.get(0) + ".tmx";
+		Array<?> doors = (Array<?>) levelData.get(1);
+		Array<?> npcs = (Array<?>) levelData.get(2);
+		Array<?> enemies = (Array<?>) levelData.get(3);
+		buildTiles(tiles);
 	}
 
 	public void render() {
@@ -95,21 +118,15 @@ public class Level {
 				if (t == null)
 					continue;
 				else if (t.getTile().getProperties().containsKey("collision")) {
-					System.out.println("Block at: " + Integer.toString(i)
-							+ ", " + Integer.toString(j));
 					addEntity(new Block(i * TILE_WIDTH, j * TILE_HEIGHT,
 							TILE_WIDTH, TILE_HEIGHT, this));
 				} else if (t.getTile().getProperties().containsKey("up")) {
-					System.out.println("Door up at: " + Integer.toString(i)
-							+ ", " + Integer.toString(j));
 					addEntity(new Door(i * TILE_WIDTH, j * TILE_HEIGHT,
 							TILE_WIDTH, TILE_HEIGHT / 2, this));
 					addEntity(new Block(i * TILE_WIDTH, (j + 0.5f)
 							* tilesLayer.getTileHeight(), TILE_WIDTH,
 							TILE_HEIGHT / 2, this));
 				} else if (t.getTile().getProperties().containsKey("down")) {
-					System.out.println("Door up at: " + Integer.toString(i)
-							+ ", " + Integer.toString(j));
 					addEntity(new Block(i * TILE_WIDTH, j * TILE_HEIGHT,
 							TILE_WIDTH, TILE_HEIGHT / 2, this));
 					addEntity(new Door(i * TILE_WIDTH,

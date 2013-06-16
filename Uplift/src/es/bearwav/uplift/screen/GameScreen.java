@@ -27,7 +27,7 @@ public class GameScreen extends Screen{
 	
 	public void init(GdxGame game){
 		super.init(game);
-		level = new Level("tmx/desert.tmx", this, game.getCam());
+		level = new Level(1, 0, this, game.getCam());
 	}
 
 }
