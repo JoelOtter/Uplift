@@ -49,7 +49,7 @@ public class Player extends Entity {
 		up = tmp[0][1];
 		right = tmp[1][1];
 		left = tmp[2][1];
-		animSpeed = 0.25f;
+		animSpeed = 0.2f;
 		leftFrames = new Array<TextureRegion>();
 		upFrames = new Array<TextureRegion>();
 		downFrames = new Array<TextureRegion>();
@@ -140,11 +140,12 @@ public class Player extends Entity {
 		BoundingBox newBounds = new BoundingBox(new Vector3(newX, newY, 0),
 				new Vector3(newX + (w * playerScale), newY
 						+ (h * boundHeight * playerScale), 0));
-		if ((l.checkCollision(newBounds) == null)){
+		Entity collision = l.checkCollision(newBounds);
+		if (collision == null){
 			x = newX;
 			y = newY;
 		}
-		else System.out.println(l.checkCollision(newBounds).toString());
+		else System.out.println(collision.toString());
 	}
 
 	private void updateBounds() {

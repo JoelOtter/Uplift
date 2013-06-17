@@ -25,6 +25,7 @@ import es.bearwav.uplift.Input;
 import es.bearwav.uplift.entity.Block;
 import es.bearwav.uplift.entity.Door;
 import es.bearwav.uplift.entity.Entity;
+import es.bearwav.uplift.entity.Npc;
 import es.bearwav.uplift.entity.Player;
 import es.bearwav.uplift.screen.GameScreen;
 
@@ -53,7 +54,7 @@ public class Level {
 		} catch (IOException e) {
 			System.out.println("Couldn't load file.");
 		}
-		player = addEntity(new Player(900, 900, this));
+		player = addEntity(new Player(100, 100, this));
 	}
 
 	private void generateLevel(int num, int door) throws IOException {
@@ -90,6 +91,12 @@ public class Level {
 					}
 				}
 			}
+		}
+		
+		//NPCs
+		Iterator<?> npcIter = npcs.iterator();
+		while (npcIter.hasNext()){
+			addEntity(new Npc((Array<?>) npcIter.next(), this));
 		}
 	}
 

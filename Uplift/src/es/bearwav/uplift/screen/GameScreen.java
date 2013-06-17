@@ -3,7 +3,6 @@ package es.bearwav.uplift.screen;
 import es.bearwav.uplift.GdxGame;
 import es.bearwav.uplift.Input;
 import es.bearwav.uplift.level.Level;
-
 public class GameScreen extends Screen{
 	
 	private Level level;
@@ -27,7 +26,7 @@ public class GameScreen extends Screen{
 	
 	public void init(GdxGame game){
 		super.init(game);
-		level = new Level(1, 0, this, game.getCam());
+		level = new Level(0, 0, this, game.getCam());
 	}
 
 }
