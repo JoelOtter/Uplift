@@ -30,7 +30,7 @@ import es.bearwav.uplift.screen.GameScreen;
 
 public class Level {
 
-	private TiledMap map;
+	public TiledMap map;
 	private OrthogonalTiledMapRenderer renderer;
 	private ArrayList<Entity> entities;
 	public boolean isSpace;
@@ -55,16 +55,17 @@ public class Level {
 		}
 		player = addEntity(new Player(900, 900, this));
 	}
-	
-	private void generateLevel(int num, int door) throws IOException{
-		//Get line from file
+
+	private void generateLevel(int num, int door) throws IOException {
+		// Get line from file
 		InputStream fs = Gdx.files.internal("levels.upl").read();
 		BufferedReader br = new BufferedReader(new InputStreamReader(fs));
-		for(int i = 0; i < num; ++i) br.readLine();
+		for (int i = 0; i < num; ++i)
+			br.readLine();
 		String levelLine = br.readLine();
 		System.out.println(levelLine);
-		
-		//Parse JSON
+
+		// Parse JSON
 		Json js = new Json();
 		ArrayList<?> levelData = js.fromJson(ArrayList.class, levelLine);
 		String tiles = "tmx/" + (String) levelData.get(0) + ".tmx";
@@ -72,27 +73,41 @@ public class Level {
 		Array<?> npcs = (Array<?>) levelData.get(2);
 		Array<?> enemies = (Array<?>) levelData.get(3);
 		buildTiles(tiles);
+
+		// Set up doors
+		Iterator<Entity> entIter = entities.iterator();
+		while (entIter.hasNext()) {
+			Iterator<?> doorIter = doors.iterator();
+			Entity ent = entIter.next();
+			while (doorIter.hasNext()) {
+				Array<?> nextdoor = (Array<?>) doorIter.next();
+				if (ent instanceof Door) {
+					if (((Door) ent).tileX == (Float) nextdoor.get(1)
+							&& ((Door) ent).tileY == (Float) nextdoor.get(2)) {
+						((Door) ent).setInfo((Float) nextdoor.get(0),
+								(Float) nextdoor.get(3),
+								(Float) nextdoor.get(4));
+					}
+				}
+			}
+		}
 	}
 
 	public void render() {
 		cam.update();
-		if (isSpace) {
-			// wrap star tiles
-		} else {
-			Gdx.graphics.getGL20().glClearColor(0, 0, 0, 1);
-			Gdx.graphics.getGL20().glClear(
-					GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-			renderer.setView(cam);
-			renderer.render(new int[] { 0, 1 });
-			screen.spriteBatch.setProjectionMatrix(cam.combined);
-			screen.spriteBatch.begin();
-			for (Entity e : entities) {
-				e.render(screen, cam);
-			}
-			screen.spriteBatch.end();
-			renderer.render(new int[] { 3 });
-			fixCamera();
+		Gdx.graphics.getGL20().glClearColor(0, 0, 0, 1);
+		Gdx.graphics.getGL20().glClear(
+				GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+		renderer.setView(cam);
+		renderer.render(new int[] { 0, 1 });
+		screen.spriteBatch.setProjectionMatrix(cam.combined);
+		screen.spriteBatch.begin();
+		for (Entity e : entities) {
+			e.render(screen, cam);
 		}
+		screen.spriteBatch.end();
+		renderer.render(new int[] { 3 });
+		fixCamera();
 	}
 
 	private void buildTiles(String tmxMap) {
@@ -160,23 +175,21 @@ public class Level {
 		cam.position.set(player.getX() + player.getWidth() / 2, player.getY()
 				+ player.getHeight() / 2, 0);
 		cam.update();
-		if (!isSpace) {
-			if (cam.frustum.boundsInFrustum(leftBound)
-					&& cam.frustum.boundsInFrustum(rightBound)) {
-				cam.position.x = (rightBound.min.x - leftBound.max.x) / 2;
-			} else if (cam.frustum.boundsInFrustum(rightBound)) {
-				cam.position.x = rightBound.min.x - cam.viewportWidth / 2;
-			} else if (cam.frustum.boundsInFrustum(leftBound)) {
-				cam.position.x = leftBound.max.x + cam.viewportWidth / 2;
-			}
-			if (cam.frustum.boundsInFrustum(topBound)
-					&& cam.frustum.boundsInFrustum(bottomBound)) {
-				cam.position.y = (topBound.min.y - bottomBound.max.y) / 2;
-			} else if (cam.frustum.boundsInFrustum(topBound)) {
-				cam.position.y = topBound.min.y - cam.viewportHeight / 2;
-			} else if (cam.frustum.boundsInFrustum(bottomBound)) {
-				cam.position.y = bottomBound.max.y + cam.viewportHeight / 2;
-			}
+		if (cam.frustum.boundsInFrustum(leftBound)
+				&& cam.frustum.boundsInFrustum(rightBound)) {
+			cam.position.x = (rightBound.min.x - leftBound.max.x) / 2;
+		} else if (cam.frustum.boundsInFrustum(rightBound)) {
+			cam.position.x = rightBound.min.x - cam.viewportWidth / 2;
+		} else if (cam.frustum.boundsInFrustum(leftBound)) {
+			cam.position.x = leftBound.max.x + cam.viewportWidth / 2;
+		}
+		if (cam.frustum.boundsInFrustum(topBound)
+				&& cam.frustum.boundsInFrustum(bottomBound)) {
+			cam.position.y = (topBound.min.y - bottomBound.max.y) / 2;
+		} else if (cam.frustum.boundsInFrustum(topBound)) {
+			cam.position.y = topBound.min.y - cam.viewportHeight / 2;
+		} else if (cam.frustum.boundsInFrustum(bottomBound)) {
+			cam.position.y = bottomBound.max.y + cam.viewportHeight / 2;
 		}
 	}
 
@@ -184,10 +197,8 @@ public class Level {
 		Iterator<Entity> eIt = entities.iterator();
 		while (eIt.hasNext()) {
 			Entity nextE = eIt.next();
-			if (overlaps(b, nextE.getBounds()) && nextE != player) {
-				System.out.println(nextE);
+			if (overlaps(b, nextE.getBounds()) && nextE != player)
 				return nextE;
-			}
 		}
 		return null;
 	}

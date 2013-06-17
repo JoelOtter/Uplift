@@ -37,7 +37,7 @@ class NewDoorDialog(Gtk.Dialog):
         YLabel = Gtk.Label("Y")
         self.YEntry = Gtk.Entry()
         toBox = Gtk.Box(spacing=2)
-        toLabel = Gtk.Label("To tileset")
+        toLabel = Gtk.Label("To tileset #")
         self.toEntry = Gtk.Entry()
         toNBox = Gtk.Box(spacing=2)
         toNLabel = Gtk.Label("To door #")
@@ -400,7 +400,7 @@ class LevelWindow(Gtk.Window):
         listData = []
         for i in self.doors:
             if i != []: listData.append(((i[0], i[1], i[2], i[3], i[4])))
-        store = Gtk.ListStore(int, int, int, str, int)
+        store = Gtk.ListStore(int, int, int, int, int)
         for item in listData:
             store.append(item)
         return store
@@ -419,7 +419,7 @@ class LevelWindow(Gtk.Window):
         column.set_sort_column_id(2)
         treeView.append_column(column)
         rendererText = Gtk.CellRendererText()
-        column = Gtk.TreeViewColumn("To tileset", rendererText, text=3)
+        column = Gtk.TreeViewColumn("To tileset #", rendererText, text=3)
         column.set_sort_column_id(3)
         treeView.append_column(column)
         rendererText = Gtk.CellRendererText()
@@ -566,7 +566,7 @@ class LevelWindow(Gtk.Window):
             num = int(dialog.numEntry.get_text())
             X = int(dialog.XEntry.get_text())
             Y = int(dialog.YEntry.get_text())
-            to = dialog.toEntry.get_text()
+            to = int(dialog.toEntry.get_text())
             toN = int(dialog.toNEntry.get_text())
             self.doors.append([num, X, Y, to, toN])
         dialog.destroy()
