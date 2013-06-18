@@ -145,7 +145,10 @@ public class Player extends Entity {
 			x = newX;
 			y = newY;
 		}
-		else System.out.println(collision.toString());
+		else{
+			this.collision(collision);
+			collision.collision(this);
+		}
 	}
 
 	private void updateBounds() {
@@ -166,6 +169,16 @@ public class Player extends Entity {
 		else
 			direction = 3;
 		return direction;
+	}
+
+	@Override
+	public void collision(Entity collider) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public void setDirection(int dir){
+		this.direction = dir;
 	}
 
 }

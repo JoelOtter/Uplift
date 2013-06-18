@@ -9,8 +9,8 @@ import es.bearwav.uplift.screen.Screen;
 
 public abstract class Entity {
 	
-	protected float x;
-	protected float y;
+	public float x;
+	public float y;
 	protected int w;
 	protected int h;
 	protected BoundingBox bounds;
@@ -41,8 +41,8 @@ public abstract class Entity {
 	public float getHeight() { return h; }
 	public BoundingBox getBounds() { return bounds; }
 	
-	public void remove(){
-		
-	}
+	public abstract void remove();
+	
+	public abstract void collision(Entity collider);
 	
 }

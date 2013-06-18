@@ -26,4 +26,12 @@ public class Block extends Entity{
 		return "Block at: " + Float.toString(x) + ", " + Float.toString(y);
 	}
 
+	@Override
+	public void collision(Entity collider) {
+	}
+
+	@Override
+	public void remove() {
+	}
+
 }

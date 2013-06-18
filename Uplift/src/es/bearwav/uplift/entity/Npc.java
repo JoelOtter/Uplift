@@ -58,4 +58,15 @@ public class Npc extends Entity{
 		screen.draw(currentFrame, x, y, w * npcScale, h * npcScale);
 	}
 
+	@Override
+	public void collision(Entity collider) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void remove() {
+		texture.dispose();
+	}
+
 }

@@ -37,7 +37,7 @@ public class Level {
 	public boolean isSpace;
 	private OrthographicCamera cam;
 	private GameScreen screen;
-	private Entity player;
+	private Player player;
 	private static final int TILE_HEIGHT = 64;
 	private static final int TILE_WIDTH = 64;
 	private BoundingBox topBound;
@@ -45,7 +45,7 @@ public class Level {
 	private BoundingBox leftBound;
 	private BoundingBox rightBound;
 
-	public Level(int num, int door, GameScreen s, OrthographicCamera cam) {
+	public Level(float num, float door, GameScreen s, OrthographicCamera cam) {
 		this.cam = cam;
 		this.screen = s;
 		entities = new ArrayList<Entity>();
@@ -54,10 +54,9 @@ public class Level {
 		} catch (IOException e) {
 			System.out.println("Couldn't load file.");
 		}
-		player = addEntity(new Player(100, 100, this));
 	}
 
-	private void generateLevel(int num, int door) throws IOException {
+	private void generateLevel(float num, float door) throws IOException {
 		// Get line from file
 		InputStream fs = Gdx.files.internal("levels.upl").read();
 		BufferedReader br = new BufferedReader(new InputStreamReader(fs));
@@ -98,6 +97,27 @@ public class Level {
 		while (npcIter.hasNext()){
 			addEntity(new Npc((Array<?>) npcIter.next(), this));
 		}
+		
+		//Player
+		float playerX = 0;
+		float playerY = 0;
+		int playerD = 0;
+		entIter = entities.iterator();
+		while (entIter.hasNext()){
+			Entity ent = entIter.next();
+			if (ent instanceof Door){
+				if (((Door) ent).num == door){
+					playerX = ((Door) ent).getPlayerX();
+					playerY = ((Door) ent).getPlayerY();
+					playerD = ((Door) ent).getPlayerD();
+					break;
+				}
+			}
+		}
+		System.out.println(playerY);
+		player = new Player(playerX, playerY, this);
+		player.setDirection(playerD);
+		addEntity(player);
 	}
 
 	public void render() {
@@ -220,6 +240,10 @@ public class Level {
 				&& ((a.max.y < b.max.y && a.max.y > b.min.y) || (a.min.y > b.min.y && a.min.y < b.max.y)))
 			return true;
 		return false;
+	}
+	
+	public void change(float to, float door){
+		screen.changeLevel(this, to, door);
 	}
 
 }

@@ -39,5 +39,28 @@ public class Door extends Entity{
 		this.toDoor = float3;
 		this.num = float1;
 	}
+	
+	public void collision(Entity collider){
+		if (collider instanceof Player){
+			l.change(toSet, toDoor);
+		}
+	}
+	
+	public int getPlayerD(){
+		if (y % 64 != 0) return 0;
+		return 2;
+	}
+	
+	public float getPlayerX(){
+		return x + 8;
+	}
+	
+	public float getPlayerY(){
+		if (y % 64 != 0) return y + 40;
+		return y - 40;
+	}
+	
+	public void remove(){
+	}
 
 }
