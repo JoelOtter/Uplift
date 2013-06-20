@@ -10,6 +10,7 @@ import java.util.Iterator;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
@@ -18,11 +19,20 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Manifold;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 
 import es.bearwav.uplift.Input;
-import es.bearwav.uplift.entity.Block;
 import es.bearwav.uplift.entity.Door;
 import es.bearwav.uplift.entity.Entity;
 import es.bearwav.uplift.entity.Npc;
@@ -34,7 +44,6 @@ public class Level {
 	public TiledMap map;
 	private OrthogonalTiledMapRenderer renderer;
 	private ArrayList<Entity> entities;
-	public boolean isSpace;
 	private OrthographicCamera cam;
 	private GameScreen screen;
 	private Player player;
@@ -44,16 +53,22 @@ public class Level {
 	private BoundingBox bottomBound;
 	private BoundingBox leftBound;
 	private BoundingBox rightBound;
+	public World world;
+	private Box2DDebugRenderer debugRenderer;
+	public float[] changeTo = {-1, -1};
 
 	public Level(float num, float door, GameScreen s, OrthographicCamera cam) {
 		this.cam = cam;
 		this.screen = s;
 		entities = new ArrayList<Entity>();
+		world = new World(new Vector2(0, 0), true);
+		createContactListener();
 		try {
 			generateLevel(num, door);
 		} catch (IOException e) {
 			System.out.println("Couldn't load file.");
 		}
+		debugRenderer = new Box2DDebugRenderer();
 	}
 
 	private void generateLevel(float num, float door) throws IOException {
@@ -114,7 +129,6 @@ public class Level {
 				}
 			}
 		}
-		System.out.println(playerY);
 		player = new Player(playerX, playerY, this);
 		player.setDirection(playerD);
 		addEntity(player);
@@ -134,7 +148,10 @@ public class Level {
 		}
 		screen.spriteBatch.end();
 		renderer.render(new int[] { 3 });
+		debugRenderer.render(world, cam.combined);
 		fixCamera();
+		world.step(Gdx.graphics.getDeltaTime(), 6, 2);
+		if (changeTo[0] != -1) change(changeTo[0], changeTo[1]);
 	}
 
 	private void buildTiles(String tmxMap) {
@@ -160,20 +177,52 @@ public class Level {
 				if (t == null)
 					continue;
 				else if (t.getTile().getProperties().containsKey("collision")) {
-					addEntity(new Block(i * TILE_WIDTH, j * TILE_HEIGHT,
-							TILE_WIDTH, TILE_HEIGHT, this));
+					float preY = 0;
+					float preX = 0;
+					float x = TILE_WIDTH;
+					float y = TILE_HEIGHT;
+					MapProperties props = t.getTile().getProperties();
+					if (t.getTile().getProperties().containsKey("x")){
+						preX = TILE_WIDTH * Float.parseFloat(props.get("preX", String.class));
+						x = TILE_WIDTH * Float.parseFloat(props.get("x", String.class));
+					}
+					if (t.getTile().getProperties().containsKey("y")){
+						preY = TILE_HEIGHT * Float.parseFloat(props.get("preY", String.class));
+						y = TILE_HEIGHT * Float.parseFloat(props.get("y", String.class));
+					}
+					BodyDef bodyDef = new BodyDef();
+					bodyDef.type = BodyType.StaticBody;
+					bodyDef.position.set(i * TILE_WIDTH + x/2 + preX, j * TILE_HEIGHT + y/2 + preY);
+					Body body = world.createBody(bodyDef);
+					PolygonShape groundBox = new PolygonShape();
+					groundBox.setAsBox(x/2, y/2);
+					body.createFixture(groundBox, 0.0f);
+					groundBox.dispose();
 				} else if (t.getTile().getProperties().containsKey("up")) {
 					addEntity(new Door(i * TILE_WIDTH, j * TILE_HEIGHT,
 							TILE_WIDTH, TILE_HEIGHT / 2, this));
-					addEntity(new Block(i * TILE_WIDTH, (j + 0.5f)
-							* tilesLayer.getTileHeight(), TILE_WIDTH,
-							TILE_HEIGHT / 2, this));
+					BodyDef bodyDef = new BodyDef();
+					bodyDef.type = BodyType.StaticBody;
+					bodyDef.position.set(i * TILE_WIDTH + TILE_WIDTH/2, (j + 0.25f)
+							* TILE_HEIGHT + TILE_HEIGHT/2);
+					Body body = world.createBody(bodyDef);
+					PolygonShape groundBox = new PolygonShape();
+					groundBox.setAsBox(TILE_WIDTH/2, TILE_HEIGHT/4);
+					body.createFixture(groundBox, 0.0f);
+					groundBox.dispose();
 				} else if (t.getTile().getProperties().containsKey("down")) {
-					addEntity(new Block(i * TILE_WIDTH, j * TILE_HEIGHT,
-							TILE_WIDTH, TILE_HEIGHT / 2, this));
 					addEntity(new Door(i * TILE_WIDTH,
 							(j + 0.5f) * TILE_HEIGHT, TILE_WIDTH,
 							TILE_HEIGHT / 2, this));
+					BodyDef bodyDef = new BodyDef();
+					bodyDef.type = BodyType.StaticBody;
+					bodyDef.position.set(i * TILE_WIDTH + TILE_WIDTH/2, (j - 0.25f)
+							* TILE_HEIGHT + TILE_HEIGHT/2);
+					Body body = world.createBody(bodyDef);
+					PolygonShape groundBox = new PolygonShape();
+					groundBox.setAsBox(TILE_WIDTH/2, TILE_HEIGHT/4);
+					body.createFixture(groundBox, 0.0f);
+					groundBox.dispose();
 				}
 			}
 		}
@@ -193,6 +242,8 @@ public class Level {
 	public void remove() {
 		map.dispose();
 		renderer.dispose();
+		world.dispose();
+		debugRenderer.dispose();
 		for (Entity e : entities) {
 			e.remove();
 		}
@@ -219,31 +270,37 @@ public class Level {
 			cam.position.y = bottomBound.max.y + cam.viewportHeight / 2;
 		}
 	}
-
-	public Entity checkCollision(BoundingBox b) {
-		Iterator<Entity> eIt = entities.iterator();
-		while (eIt.hasNext()) {
-			Entity nextE = eIt.next();
-			if (overlaps(b, nextE.getBounds()) && nextE != player)
-				return nextE;
-		}
-		return null;
-	}
-
-	private boolean overlaps(BoundingBox a, BoundingBox b) {
-		if (a.max.x > b.min.x
-				&& a.max.x < b.max.x
-				&& ((a.min.y < b.max.y && a.min.y > b.min.y) || (a.max.y > b.min.y && a.max.y < b.max.y)))
-			return true;
-		if (a.min.x > b.min.x
-				&& a.min.x < b.max.x
-				&& ((a.max.y < b.max.y && a.max.y > b.min.y) || (a.min.y > b.min.y && a.min.y < b.max.y)))
-			return true;
-		return false;
-	}
 	
 	public void change(float to, float door){
+		while (world.isLocked()){
+			continue;
+		}
 		screen.changeLevel(this, to, door);
+	}
+	
+	private void createContactListener(){
+		world.setContactListener(new ContactListener(){
+
+			@Override
+			public void beginContact(Contact contact) {
+				Object userdataA = contact.getFixtureA().getBody().getUserData();
+				Object userdataB = contact.getFixtureB().getBody().getUserData();
+				if (userdataA instanceof Entity) ((Entity) userdataA).collide(userdataB);
+				if (userdataB instanceof Entity) ((Entity) userdataB).collide(userdataA);
+			}
+
+			@Override
+			public void endContact(Contact contact) {
+			}
+
+			@Override
+			public void preSolve(Contact contact, Manifold oldManifold) {
+			}
+
+			@Override
+			public void postSolve(Contact contact, ContactImpulse impulse) {
+			}	
+		});
 	}
 
 }

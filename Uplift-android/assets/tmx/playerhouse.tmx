@@ -2,6 +2,13 @@
 <map version="1.0" orientation="orthogonal" width="7" height="7" tilewidth="64" tileheight="64">
  <tileset firstgid="1" name="desert-inside" tilewidth="64" tileheight="64" spacing="2" margin="1">
   <image source="../gfx/desert-inside.png" trans="ff40ff" width="528" height="528"/>
+  <tile id="27">
+   <properties>
+    <property name="collision" value=""/>
+    <property name="preX" value="0.2"/>
+    <property name="x" value="0.6"/>
+   </properties>
+  </tile>
   <tile id="60">
    <properties>
     <property name="down" value=""/>
@@ -30,7 +37,7 @@
  </layer>
  <layer name="collides" width="7" height="7">
   <data encoding="base64">
-   AAAAAEAAAABAAAAAQAAAAEAAAABAAAAAAAAAAEAAAABAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAABAAAAAAAAAAAAAAABAAAAAQAAAAAAAAABAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAQAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAEAAAABAAAAAPQAAAEAAAABAAAAAAAAAAA==
+   AAAAAEAAAABAAAAAQAAAAEAAAABAAAAAAAAAAEAAAABAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAABAAAAAAAAAAAAAAAAcAAAAQAAAAAAAAABAAAAAQAAAAAAAAAAAAAAAAAAAABwAAAAAAAAAQAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAEAAAABAAAAAPQAAAEAAAABAAAAAAAAAAA==
   </data>
  </layer>
  <layer name="top" width="7" height="7">

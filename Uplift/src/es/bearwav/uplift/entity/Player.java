@@ -6,8 +6,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.math.collision.BoundingBox;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Array;
 
 import es.bearwav.uplift.Input;
@@ -28,13 +30,14 @@ public class Player extends Entity {
 	private Vector2 velocity;
 	private int direction;
 	private TextureRegion currentFrame;
-	private static final float MAX_SPEED = 1.5f;
+	private static final float MAX_SPEED = 80f;
 	private float stateTime;
 	private float animSpeed;
 	private Animation rightAnimation;
 	private Animation leftAnimation;
 	private Animation upAnimation;
 	private Animation downAnimation;
+	private Body body;
 	private static final float playerScale = 0.6f;
 	private static final float boundHeight = 0.3f;
 
@@ -67,14 +70,27 @@ public class Player extends Entity {
 		direction = 2;
 		stateTime = 0;
 		currentFrame = down;
-		bounds = new BoundingBox(new Vector3(x, y, 0), new Vector3(x
-				+ (w * playerScale), y + (h * playerScale * boundHeight), 0));
+		
+		//Physics
+		BodyDef bodyDef = new BodyDef();
+		bodyDef.type = BodyType.DynamicBody;
+		bodyDef.position.set(x + (w * playerScale)/2, y + (h * playerScale * boundHeight)/2);
+		body = l.world.createBody(bodyDef);
+		PolygonShape groundBox = new PolygonShape();
+		groundBox.setAsBox(w/2 * playerScale, h/2 * boundHeight * playerScale);
+		body.createFixture(groundBox, 0.0f);
+		groundBox.dispose();
+		body.setLinearVelocity(0, 0);
+		body.setFixedRotation(true);
+		body.setUserData(this);
 	}
 
 	@Override
 	public void render(Screen screen, Camera cam) {
 		stateTime += Gdx.graphics.getDeltaTime();
 		screen.draw(currentFrame, x, y, w * playerScale, h * playerScale);
+		x = body.getPosition().x - (w * playerScale)/2;
+		y = body.getPosition().y - (h * playerScale * boundHeight)/2;
 	}
 
 	public void remove() {
@@ -92,12 +108,11 @@ public class Player extends Entity {
 			velocity.x = -MAX_SPEED;
 		if (input.keys[input.right])
 			velocity.x = MAX_SPEED;
+		body.setLinearVelocity(velocity);
 		if (velocity.x == 0 && velocity.y == 0)
 			stop();
 		else
 			animate(calculateDirection());
-		updatePosition();
-		updateBounds();
 	}
 
 	private void stop() {
@@ -134,30 +149,6 @@ public class Player extends Entity {
 		}
 	}
 
-	private void updatePosition() {
-		float newX = x + velocity.x;
-		float newY = y + velocity.y;
-		BoundingBox newBounds = new BoundingBox(new Vector3(newX, newY, 0),
-				new Vector3(newX + (w * playerScale), newY
-						+ (h * boundHeight * playerScale), 0));
-		Entity collision = l.checkCollision(newBounds);
-		if (collision == null){
-			x = newX;
-			y = newY;
-		}
-		else{
-			this.collision(collision);
-			collision.collision(this);
-		}
-	}
-
-	private void updateBounds() {
-		bounds.min.x = x;
-		bounds.min.y = y;
-		bounds.max.x = x + w;
-		bounds.max.y = y + (h * playerScale * boundHeight);
-	}
-
 	private int calculateDirection() {
 		double angle = Math.toDegrees(Math.atan2(velocity.x, velocity.y));
 		if (Math.abs(angle) < 50)
@@ -170,15 +161,13 @@ public class Player extends Entity {
 			direction = 3;
 		return direction;
 	}
-
-	@Override
-	public void collision(Entity collider) {
-		// TODO Auto-generated method stub
-		
-	}
 	
 	public void setDirection(int dir){
 		this.direction = dir;
+	}
+
+	@Override
+	public void collide(Object collider) {
 	}
 
 }

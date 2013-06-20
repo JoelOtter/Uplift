@@ -1,7 +1,6 @@
 package es.bearwav.uplift.entity;
 
 import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.math.collision.BoundingBox;
 
 import es.bearwav.uplift.Input;
 import es.bearwav.uplift.level.Level;
@@ -13,7 +12,6 @@ public abstract class Entity {
 	public float y;
 	protected int w;
 	protected int h;
-	protected BoundingBox bounds;
 	protected Level l;
 	
 	public Entity(float x, float y, Level l){
@@ -39,10 +37,9 @@ public abstract class Entity {
 	public float getY() { return y; }
 	public float getWidth() { return w; }
 	public float getHeight() { return h; }
-	public BoundingBox getBounds() { return bounds; }
 	
 	public abstract void remove();
 	
-	public abstract void collision(Entity collider);
+	public abstract void collide(Object collider);
 	
 }

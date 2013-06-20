@@ -48,8 +48,6 @@ public class Npc extends Entity{
 		left = tmp[2][1];
 		currentFrame = down;
 		stateTime = 0;
-		bounds = new BoundingBox(new Vector3(x, y, 0), new Vector3(x
-				+ (w * npcScale), y + (h * npcScale), 0));
 	}
 
 	@Override
@@ -59,14 +57,11 @@ public class Npc extends Entity{
 	}
 
 	@Override
-	public void collision(Entity collider) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void remove() {
 		texture.dispose();
+	}
+	
+	public void collide(Object collider){
 	}
 
 }

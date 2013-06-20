@@ -2,8 +2,10 @@ package es.bearwav.uplift.entity;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.math.collision.BoundingBox;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 
 import es.bearwav.uplift.level.Level;
 import es.bearwav.uplift.screen.Screen;
@@ -15,6 +17,8 @@ public class Door extends Entity{
 	public float toSet;
 	public float toDoor;
 	public float num;
+	private Body body;
+	private boolean up = false;
 
 	public Door(float x, float y, int w, int h, Level l) {
 		super(x, y, l);
@@ -24,10 +28,24 @@ public class Door extends Entity{
 		this.h = h;
 		this.tileX = x;
 		this.tileY = y;
-		if (y % 64 != 0) this.tileY -= 32;
+		if (y % 64 != 0) up = true;
+		if (up) this.tileY -= 32;
 		this.tileX = this.tileX/64;
 		this.tileY = ((TiledMapTileLayer) l.map.getLayers().get(0)).getHeight() - this.tileY/64 - 1;
-		bounds = new BoundingBox(new Vector3(x, y, 0), new Vector3(x+w, y+h, 0));
+		
+		// Physics
+		BodyDef bodyDef = new BodyDef();
+		bodyDef.type = BodyType.StaticBody;
+		float posY = 0;
+		if (up) posY = y + h/2 - h/4;
+		else posY = y + h/2 + h/4;
+		bodyDef.position.set(x + w/2, posY);
+		body = l.world.createBody(bodyDef);
+		PolygonShape groundBox = new PolygonShape();
+		groundBox.setAsBox(w/2, h/4);
+		body.createFixture(groundBox, 0.0f);
+		groundBox.dispose();
+		body.setUserData(this);
 	}
 
 	@Override
@@ -40,14 +58,8 @@ public class Door extends Entity{
 		this.num = float1;
 	}
 	
-	public void collision(Entity collider){
-		if (collider instanceof Player){
-			l.change(toSet, toDoor);
-		}
-	}
-	
 	public int getPlayerD(){
-		if (y % 64 != 0) return 0;
+		if (up) return 0;
 		return 2;
 	}
 	
@@ -56,11 +68,19 @@ public class Door extends Entity{
 	}
 	
 	public float getPlayerY(){
-		if (y % 64 != 0) return y + 40;
+		if (up) return y + 40;
 		return y - 40;
 	}
 	
 	public void remove(){
+	}
+	
+	public void collide(Object collider) {
+		if (collider instanceof Player) {
+			System.out.println("Hit a door!");
+			l.changeTo[0] = toSet;
+			l.changeTo[1] = toDoor;
+		}
 	}
 
 }
