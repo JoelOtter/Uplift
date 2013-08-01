@@ -11,19 +11,24 @@ public class Input implements InputProcessor{
 	public int right = 1;
 	public int down = 2;
 	public int left = 3;
+	public int space = 4;
+	private boolean dirDisabled = false;
 	
 	public Input(){
-		keys = new boolean[4];
+		keys = new boolean[5];
 		for (int i = 0; i < keys.length; i++){
 			keys[i] = false;
 		}
 	}
 	
-	private void set(int key, boolean to){
-		if (key == Keys.LEFT) {keys[left] = to;}
-		if (key == Keys.DOWN) {keys[down] = to;}
-		if (key == Keys.RIGHT) {keys[right] = to;}
-		if (key == Keys.UP) {keys[up] = to;}
+	public void set(int key, boolean to){
+		if (!dirDisabled){
+			if (key == Keys.LEFT) {keys[left] = to;}
+			if (key == Keys.DOWN) {keys[down] = to;}
+			if (key == Keys.RIGHT) {keys[right] = to;}
+			if (key == Keys.UP) {keys[up] = to;}
+		}
+		if (key == Keys.SPACE) {keys[space] = to;}
 	}
 
 	@Override
@@ -72,5 +77,12 @@ public class Input implements InputProcessor{
 	public boolean scrolled(int amount) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	
+	public void setDirectionsDisabled(boolean dis){
+		dirDisabled = dis;
+		for (int i=0; i < 4; i++){
+			keys[i] = false;
+		}
 	}
 }

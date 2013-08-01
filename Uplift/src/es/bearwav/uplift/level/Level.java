@@ -56,6 +56,8 @@ public class Level {
 	public World world;
 	private Box2DDebugRenderer debugRenderer;
 	public float[] changeTo = {-1, -1};
+	public Npc currentNpc;
+	private boolean buttonDown;
 
 	public Level(float num, float door, GameScreen s, OrthographicCamera cam) {
 		this.cam = cam;
@@ -150,7 +152,7 @@ public class Level {
 		renderer.render(new int[] { 3 });
 		debugRenderer.render(world, cam.combined);
 		fixCamera();
-		world.step(Gdx.graphics.getDeltaTime(), 6, 2);
+		world.step(1/45f, 6, 2);
 		if (changeTo[0] != -1) change(changeTo[0], changeTo[1]);
 	}
 
@@ -232,6 +234,13 @@ public class Level {
 		for (Entity e : entities) {
 			e.tick(input);
 		}
+		if (input.keys[input.space] && !buttonDown){
+			buttonDown = true;
+			processButtonPress();
+		}
+		if (!input.keys[input.space]){
+			buttonDown = false;
+		}
 	}
 
 	public Entity addEntity(Entity e) {
@@ -291,6 +300,10 @@ public class Level {
 
 			@Override
 			public void endContact(Contact contact) {
+				Object userdataA = contact.getFixtureA().getBody().getUserData();
+				Object userdataB = contact.getFixtureB().getBody().getUserData();
+				if (userdataA instanceof Entity) ((Entity) userdataA).endContact(userdataB);
+				if (userdataB instanceof Entity) ((Entity) userdataB).endContact(userdataA);
 			}
 
 			@Override
@@ -301,6 +314,17 @@ public class Level {
 			public void postSolve(Contact contact, ContactImpulse impulse) {
 			}	
 		});
+	}
+	
+	public void enableConv(Npc conv){
+		currentNpc = conv;
+		System.out.println(currentNpc);
+	}
+	
+	public void processButtonPress(){
+		if (currentNpc != null){
+			screen.processConversation(currentNpc);
+		}
 	}
 
 }

@@ -42,4 +42,6 @@ public abstract class Entity {
 	
 	public abstract void collide(Object collider);
 	
+	public abstract void endContact(Object collider);
+	
 }

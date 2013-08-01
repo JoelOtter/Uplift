@@ -46,5 +46,9 @@ public class Stats {
 	
 	public int getMoney() { return money; }
 	public int getHealth() { return health; }
-	public int getMain() { return mainquest; }
+	
+	public int getQuest(String name) {
+		if (name == "MAIN") return mainquest;
+		else return 0;
+	}
 }

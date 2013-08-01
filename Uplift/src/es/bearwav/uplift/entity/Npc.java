@@ -4,8 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.math.collision.BoundingBox;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Array;
 
 import es.bearwav.uplift.level.Level;
@@ -17,8 +19,8 @@ public class Npc extends Entity{
 	private float anim;
 	private float dir;
 	private float speed;
-	private String quest;
-	private Array<?> convs;
+	public String quest;
+	public Array<?> convs;
 	private Texture texture;
 	private TextureRegion down;
 	private TextureRegion up;
@@ -26,6 +28,7 @@ public class Npc extends Entity{
 	private TextureRegion right;
 	private float stateTime;
 	private TextureRegion currentFrame;
+	private Body body;
 	
 	private static final float npcScale = 0.6f;
 
@@ -48,6 +51,19 @@ public class Npc extends Entity{
 		left = tmp[2][1];
 		currentFrame = down;
 		stateTime = 0;
+		
+		//Physics
+		BodyDef bodyDef = new BodyDef();
+		bodyDef.type = BodyType.StaticBody;
+		bodyDef.position.set(x + (w * npcScale)/2, y + (h * npcScale)/2);
+		body = l.world.createBody(bodyDef);
+		PolygonShape groundBox = new PolygonShape();
+		groundBox.setAsBox(w/2 * npcScale, h/2 * npcScale);
+		body.createFixture(groundBox, 0.0f);
+		groundBox.dispose();
+		body.setLinearVelocity(0, 0);
+		body.setFixedRotation(true);
+		body.setUserData(this);
 	}
 
 	@Override
@@ -62,6 +78,14 @@ public class Npc extends Entity{
 	}
 	
 	public void collide(Object collider){
+	}
+	
+	public void endContact(Object collider){
+	}
+	
+	@Override
+	public String toString(){
+		return "Npc at " + x + ", " + y;
 	}
 
 }

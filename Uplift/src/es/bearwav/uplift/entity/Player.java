@@ -168,6 +168,14 @@ public class Player extends Entity {
 
 	@Override
 	public void collide(Object collider) {
+		if (collider instanceof Npc){
+			l.enableConv((Npc) collider);
+		}
+	}
+	
+	@Override
+	public void endContact(Object collider){
+		l.currentNpc = null;
 	}
 
 }

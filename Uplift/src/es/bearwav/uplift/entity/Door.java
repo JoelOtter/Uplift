@@ -83,4 +83,8 @@ public class Door extends Entity{
 		}
 	}
 
+	@Override
+	public void endContact(Object collider) {
+	}
+
 }

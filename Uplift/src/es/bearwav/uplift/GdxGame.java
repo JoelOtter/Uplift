@@ -27,6 +27,7 @@ public class GdxGame implements ApplicationListener {
 		setScreen(new GameScreen());
 		input = new Input();
 		Gdx.input.setInputProcessor(input);
+		Gdx.graphics.setVSync(true);
 	}
 
 	@Override
@@ -57,6 +58,10 @@ public class GdxGame implements ApplicationListener {
 	//Game stuff
 	public Stats getStats(){
 		return stats;
+	}
+	
+	public Input getInput(){
+		return input;
 	}
 	
 	private void setScreen(Screen scr){
