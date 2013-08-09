@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Array;
 
 import es.bearwav.uplift.GdxGame;
 import es.bearwav.uplift.Input;
+import es.bearwav.uplift.Stats;
 import es.bearwav.uplift.entity.Npc;
 import es.bearwav.uplift.level.Level;
 
@@ -92,5 +93,8 @@ public class GameScreen extends Screen{
 		game.getInput().setDirectionsDisabled(false);
 		convBuf = "000ready";
 	}
+	
+	public Stats getStats(){ return game.getStats(); }
+	public Input getInput(){ return game.getInput(); }
 
 }

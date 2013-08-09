@@ -1,3 +1,3 @@
 ["playerhouse", [[0, 3, 6, 1, 3]], [["altnpcgrid2.png", 200, 200, 0, 2, 0.0, ["MAIN", [[0, "+", "My friend Ke is here to wake me. \"Morning, Ra! The Elder wants to see you!\" he says. I make a mental note to lock my door in future."]]]]], []]
-["desert", [[3, 28, 27, 0, 0], [2, 12, 26, 2, 0]], [], []]
+["desert", [[3, 28, 27, 0, 0], [2, 12, 26, 2, 0]], [], [["DYNAMIC", "doggeh.png", 400, 400, 3]]]
 ["deserthouse", [[0, 7, 7, 1, 2]], [], []]

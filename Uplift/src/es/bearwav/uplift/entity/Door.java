@@ -77,7 +77,6 @@ public class Door extends Entity{
 	
 	public void collide(Object collider) {
 		if (collider instanceof Player) {
-			System.out.println("Hit a door!");
 			l.changeTo[0] = toSet;
 			l.changeTo[1] = toDoor;
 		}

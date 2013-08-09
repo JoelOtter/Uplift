@@ -23,6 +23,10 @@ public class Player extends Entity {
 	private TextureRegion up;
 	private TextureRegion left;
 	private TextureRegion right;
+	private TextureRegion shootDown;
+	private TextureRegion shootUp;
+	private TextureRegion shootLeft;
+	private TextureRegion shootRight;
 	private Array<TextureRegion> leftFrames;
 	private Array<TextureRegion> rightFrames;
 	private Array<TextureRegion> upFrames;
@@ -40,6 +44,11 @@ public class Player extends Entity {
 	private Body body;
 	private static final float playerScale = 0.6f;
 	private static final float boundHeight = 0.3f;
+	private boolean takingDamage = false;
+	private float damageTime;
+	private int damageDirection;
+	private boolean isAttacking = false;
+	private float attackTime;
 
 	public Player(float x, float y, Level l) {
 		super(x, y, l);
@@ -52,6 +61,10 @@ public class Player extends Entity {
 		up = tmp[0][1];
 		right = tmp[1][1];
 		left = tmp[2][1];
+		shootDown = tmp[3][4];
+		shootUp = tmp[0][4];
+		shootRight = tmp[1][4];
+		shootLeft = tmp[2][4];
 		animSpeed = 0.2f;
 		leftFrames = new Array<TextureRegion>();
 		upFrames = new Array<TextureRegion>();
@@ -70,6 +83,8 @@ public class Player extends Entity {
 		direction = 2;
 		stateTime = 0;
 		currentFrame = down;
+		damageTime = 0;
+		attackTime = 0;
 		
 		//Physics
 		BodyDef bodyDef = new BodyDef();
@@ -87,7 +102,10 @@ public class Player extends Entity {
 
 	@Override
 	public void render(Screen screen, Camera cam) {
-		stateTime += Gdx.graphics.getDeltaTime();
+		float time = Gdx.graphics.getDeltaTime();
+		stateTime += time;
+		if (takingDamage) damageTime += time;
+		if (isAttacking) attackTime += time;
 		screen.draw(currentFrame, x, y, w * playerScale, h * playerScale);
 		x = body.getPosition().x - (w * playerScale)/2;
 		y = body.getPosition().y - (h * playerScale * boundHeight)/2;
@@ -98,21 +116,39 @@ public class Player extends Entity {
 	}
 
 	public void tick(Input input) {
-		velocity.x = 0;
-		velocity.y = 0;
-		if (input.keys[input.down])
-			velocity.y = -MAX_SPEED;
-		if (input.keys[input.up])
-			velocity.y = MAX_SPEED;
-		if (input.keys[input.left])
-			velocity.x = -MAX_SPEED;
-		if (input.keys[input.right])
-			velocity.x = MAX_SPEED;
+		
 		body.setLinearVelocity(velocity);
-		if (velocity.x == 0 && velocity.y == 0)
+		
+		if (takingDamage){
 			stop();
-		else
-			animate(calculateDirection());
+			setVelocityDamage();
+			if (damageTime > 0.2f){
+				takingDamage = false;
+				damageTime = 0;
+			}
+		}
+		else if (isAttacking){
+			if (attackTime > 1){
+				isAttacking = false;
+				attackTime = 0;
+			}
+		}
+		else{
+			velocity.x = 0;
+			velocity.y = 0;
+			if (input.keys[input.down])
+				velocity.y = -MAX_SPEED;
+			if (input.keys[input.up])
+				velocity.y = MAX_SPEED;
+			if (input.keys[input.left])
+				velocity.x = -MAX_SPEED;
+			if (input.keys[input.right])
+				velocity.x = MAX_SPEED;
+			if (velocity.x == 0 && velocity.y == 0)
+				stop();
+			else
+				animate(calculateDirection());
+		}
 	}
 
 	private void stop() {
@@ -128,6 +164,23 @@ public class Player extends Entity {
 			break;
 		case 3:
 			currentFrame = left;
+			break;
+		}
+	}
+	
+	private void shootTile() {
+		switch (direction) {
+		case 0:
+			currentFrame = shootUp;
+			break;
+		case 1:
+			currentFrame = shootRight;
+			break;
+		case 2:
+			currentFrame = shootDown;
+			break;
+		case 3:
+			currentFrame = shootLeft;
 			break;
 		}
 	}
@@ -176,6 +229,39 @@ public class Player extends Entity {
 	@Override
 	public void endContact(Object collider){
 		l.currentNpc = null;
+	}
+	
+	public void damage(int dir){
+		if (l.getStats().decHealth(10) <= 0){
+			die();
+		}
+		takingDamage = true;
+		if (velocity.x == 0 && velocity.y == 0){
+			damageDirection = dir;
+		}
+		else damageDirection = (direction + 2) % 4;
+	}
+	
+	private void die(){
+		System.out.println("You are dead.");
+	}
+	
+	private void setVelocityDamage(){
+		switch (damageDirection){
+		case 0: velocity.x = 0; velocity.y = MAX_SPEED * 10; break;
+		case 1: velocity.x = MAX_SPEED * 10; velocity.y = 0; break;
+		case 2: velocity.x = 0; velocity.y = -MAX_SPEED * 10; break;
+		case 3: velocity.x = -MAX_SPEED * 10; velocity.y = 0; break;
+		}
+	}
+	
+	public void attack(){
+		if (!isAttacking){
+			isAttacking = true;
+			shootTile();
+			velocity.x = 0;
+			velocity.y = 0;
+		}
 	}
 
 }

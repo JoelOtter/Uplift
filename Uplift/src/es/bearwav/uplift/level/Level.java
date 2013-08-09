@@ -33,7 +33,9 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 
 import es.bearwav.uplift.Input;
+import es.bearwav.uplift.Stats;
 import es.bearwav.uplift.entity.Door;
+import es.bearwav.uplift.entity.Enemy;
 import es.bearwav.uplift.entity.Entity;
 import es.bearwav.uplift.entity.Npc;
 import es.bearwav.uplift.entity.Player;
@@ -58,6 +60,7 @@ public class Level {
 	public float[] changeTo = {-1, -1};
 	public Npc currentNpc;
 	private boolean buttonDown;
+	private boolean isCombatArea = false;
 
 	public Level(float num, float door, GameScreen s, OrthographicCamera cam) {
 		this.cam = cam;
@@ -113,6 +116,13 @@ public class Level {
 		Iterator<?> npcIter = npcs.iterator();
 		while (npcIter.hasNext()){
 			addEntity(new Npc((Array<?>) npcIter.next(), this));
+		}
+		
+		//Enemies
+		Iterator<?> enemyIter = enemies.iterator();
+		while (enemyIter.hasNext()){
+			isCombatArea = true;
+			addEntity(new Enemy((Array<?>) enemyIter.next(), this));
 		}
 		
 		//Player
@@ -325,6 +335,12 @@ public class Level {
 		if (currentNpc != null){
 			screen.processConversation(currentNpc);
 		}
+		else if (isCombatArea) {
+			player.attack();
+		}
 	}
+	
+	public Stats getStats(){ return screen.getStats(); }
+	public Input getInput(){ return screen.getInput(); }
 
 }
