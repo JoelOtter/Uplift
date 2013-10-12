@@ -49,6 +49,7 @@ public class Player extends Entity {
 	private int damageDirection;
 	private boolean isAttacking = false;
 	private float attackTime;
+	private Lightning lightning;
 
 	public Player(float x, float y, Level l) {
 		super(x, y, l);
@@ -86,6 +87,9 @@ public class Player extends Entity {
 		damageTime = 0;
 		attackTime = 0;
 		
+		//Spells
+		lightning = new Lightning(x, y, l);
+		
 		//Physics
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyType.DynamicBody;
@@ -106,7 +110,13 @@ public class Player extends Entity {
 		stateTime += time;
 		if (takingDamage) damageTime += time;
 		if (isAttacking) attackTime += time;
-		screen.draw(currentFrame, x, y, w * playerScale, h * playerScale);
+		if (direction == 0) {
+			lightning.render(screen, cam);
+		}
+		screen.draw(currentFrame, x, y, w * playerScale, h * playerScale, 0);
+		if (direction != 0){
+			lightning.render(screen, cam);
+		}
 		x = body.getPosition().x - (w * playerScale)/2;
 		y = body.getPosition().y - (h * playerScale * boundHeight)/2;
 	}
@@ -128,7 +138,7 @@ public class Player extends Entity {
 			}
 		}
 		else if (isAttacking){
-			if (attackTime > 1){
+			if (attackTime > 0.5f){
 				isAttacking = false;
 				attackTime = 0;
 			}
@@ -149,6 +159,7 @@ public class Player extends Entity {
 			else
 				animate(calculateDirection());
 		}
+		lightning.updatePosition(direction, x, y, w * playerScale, h * playerScale);
 	}
 
 	private void stop() {
@@ -261,6 +272,7 @@ public class Player extends Entity {
 			shootTile();
 			velocity.x = 0;
 			velocity.y = 0;
+			lightning.activate();
 		}
 	}
 

@@ -18,8 +18,8 @@ import es.bearwav.uplift.Input;
 import es.bearwav.uplift.level.Level;
 import es.bearwav.uplift.screen.Screen;
 
-public class Enemy extends Entity{
-	
+public class Enemy extends Entity {
+
 	private String type;
 	private String tileset;
 	private float hp;
@@ -28,6 +28,7 @@ public class Enemy extends Entity{
 	private Array<TextureRegion> rightFrames;
 	private Array<TextureRegion> upFrames;
 	private Array<TextureRegion> downFrames;
+	private Array<TextureRegion> utilityFrames;
 	private Vector2 velocity;
 	private int direction;
 	private TextureRegion currentFrame;
@@ -45,6 +46,10 @@ public class Enemy extends Entity{
 	private boolean attacking = false;
 	private Random rand = new Random();
 	private boolean collidable = true;
+	private boolean takingDamage = false;
+	private int damageDirection;
+	private float damageTime;
+	private boolean alive = true;
 
 	public Enemy(Array<?> data, Level l) {
 		super((Float) data.get(2), (Float) data.get(3), l);
@@ -59,7 +64,9 @@ public class Enemy extends Entity{
 		upFrames = new Array<TextureRegion>();
 		downFrames = new Array<TextureRegion>();
 		rightFrames = new Array<TextureRegion>();
+		utilityFrames = new Array<TextureRegion>();
 		for (int i = 0; i < 4; i++) {
+			utilityFrames.add(tmp[0][i]);
 			upFrames.add(tmp[1][i]);
 			rightFrames.add(tmp[2][i]);
 			leftFrames.add(tmp[3][i]);
@@ -75,14 +82,16 @@ public class Enemy extends Entity{
 		directionTime = 0;
 		changeRate = 3;
 		currentFrame = leftFrames.get(1);
-		
-		//Physics
+		damageTime = 0;
+
+		// Physics
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyType.DynamicBody;
-		bodyDef.position.set(x + (w * enemyScale)/2, y + (h * enemyScale)/2);
+		bodyDef.position
+				.set(x + (w * enemyScale) / 2, y + (h * enemyScale) / 2);
 		body = l.world.createBody(bodyDef);
 		PolygonShape groundBox = new PolygonShape();
-		groundBox.setAsBox(w/2 * enemyScale, h/2 * enemyScale);
+		groundBox.setAsBox(w / 2 * enemyScale, h / 2 * enemyScale);
 		body.createFixture(groundBox, 0.0f).setRestitution(0.5f);
 		groundBox.dispose();
 		body.setLinearVelocity(0, 0);
@@ -93,48 +102,75 @@ public class Enemy extends Entity{
 
 	@Override
 	public void render(Screen screen, Camera cam) {
-		float time = Gdx.graphics.getDeltaTime();
-		stateTime += time;
-		directionTime += time;
-		screen.draw(currentFrame, x, y, w * enemyScale, h * enemyScale);
-		x = body.getPosition().x - (w * enemyScale)/2;
-		y = body.getPosition().y - (h * enemyScale)/2;
-	}
-	
-	public void tick(Input input){
-		if (!attacking){
-			if (directionTime > changeRate){
-				directionTime = 0;
-				setDirection(rand.nextInt(4));
-			}
+		if (alive) {
+			float time = Gdx.graphics.getDeltaTime();
+			stateTime += time;
+			if (takingDamage)
+				damageTime += time;
+			else
+				directionTime += time;
 		}
-		body.setLinearVelocity(velocity);
-		animate(direction);
+		screen.draw(currentFrame, x, y, w * enemyScale, h * enemyScale, 0);
+		x = body.getPosition().x - (w * enemyScale) / 2;
+		y = body.getPosition().y - (h * enemyScale) / 2;
 	}
-	
-	private void setDirection(int dir){
+
+	public void tick(Input input) {
+		if (alive) {
+			if (takingDamage) {
+				setVelocityDamage();
+				if (damageTime > 0.2f) {
+					takingDamage = false;
+					damageTime = 0;
+					directionTime = changeRate;
+				}
+			} else if (!attacking) {
+				if (directionTime >= changeRate) {
+					directionTime = 0;
+					setDirection(rand.nextInt(4));
+				}
+			}
+			body.setLinearVelocity(velocity);
+			animate(direction);
+		}
+	}
+
+	private void setDirection(int dir) {
 		direction = dir;
-		switch (dir){
-			case 0: velocity.x = 0; velocity.y = MAX_SPEED; break;
-			case 1: velocity.x = MAX_SPEED; velocity.y = 0; break;
-			case 2: velocity.x = 0; velocity.y = -MAX_SPEED; break;
-			case 3: velocity.x = -MAX_SPEED; velocity.y = 0; break;
+		switch (dir) {
+		case 0:
+			velocity.x = 0;
+			velocity.y = MAX_SPEED;
+			break;
+		case 1:
+			velocity.x = MAX_SPEED;
+			velocity.y = 0;
+			break;
+		case 2:
+			velocity.x = 0;
+			velocity.y = -MAX_SPEED;
+			break;
+		case 3:
+			velocity.x = -MAX_SPEED;
+			velocity.y = 0;
+			break;
 		}
 	}
 
 	@Override
 	public void remove() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void collide(Object collider) {
-		if (collider instanceof Player){
+		if (collider instanceof Player) {
 			((Player) collider).damage(direction);
 		}
-		if (collidable){
-			//Reverse direction
+		if (collider instanceof Lightning) return;
+		if (collidable) {
+			// Reverse direction
 			setDirection((direction + 2) % 4);
 			collidable = false;
 		}
@@ -144,7 +180,7 @@ public class Enemy extends Entity{
 	public void endContact(Object collider) {
 		collidable = true;
 	}
-	
+
 	private void animate(int dir) {
 		switch (dir) {
 		case 0:
@@ -161,5 +197,29 @@ public class Enemy extends Entity{
 			break;
 		}
 	}
-
+	
+	public void damage(int dir){
+		if (--hp <= 0){
+			die();
+		}
+		takingDamage = true;
+		damageDirection = dir;
+	}
+	
+	private void die(){
+		alive = false;
+		velocity.x = 0;
+		velocity.y = 0;
+		currentFrame = utilityFrames.get(0);
+		l.world.destroyBody(body);
+	}
+	
+	private void setVelocityDamage(){
+		switch (damageDirection){
+		case 0: velocity.x = 0; velocity.y = MAX_SPEED * 10; break;
+		case 1: velocity.x = MAX_SPEED * 10; velocity.y = 0; break;
+		case 2: velocity.x = 0; velocity.y = -MAX_SPEED * 10; break;
+		case 3: velocity.x = -MAX_SPEED * 10; velocity.y = 0; break;
+		}
+	}
 }

@@ -69,7 +69,7 @@ public class Npc extends Entity{
 	@Override
 	public void render(Screen screen, Camera cam) {
 		stateTime += Gdx.graphics.getDeltaTime();
-		screen.draw(currentFrame, x, y, w * npcScale, h * npcScale);
+		screen.draw(currentFrame, x, y, w * npcScale, h * npcScale, 0);
 	}
 
 	@Override
