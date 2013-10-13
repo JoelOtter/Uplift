@@ -4,11 +4,11 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 
 import es.bearwav.uplift.level.Level;
-import es.bearwav.uplift.screen.Screen;
+import es.bearwav.uplift.screen.GameScreen;
 
 public class Door extends Entity{
 	
@@ -49,7 +49,7 @@ public class Door extends Entity{
 	}
 
 	@Override
-	public void render(Screen screen, Camera cam) {
+	public void render(GameScreen screen, Camera cam) {
 	}
 	
 	public void setInfo(Float float1, Float float2, Float float3){

@@ -27,7 +27,7 @@ public class GdxGame implements ApplicationListener {
 		setScreen(new GameScreen());
 		input = new Input();
 		Gdx.input.setInputProcessor(input);
-		Gdx.graphics.setVSync(true);
+		Gdx.graphics.setVSync(false);
 	}
 
 	@Override

@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Camera;
 
 import es.bearwav.uplift.Input;
 import es.bearwav.uplift.level.Level;
-import es.bearwav.uplift.screen.Screen;
+import es.bearwav.uplift.screen.GameScreen;
 
 public abstract class Entity {
 	
@@ -20,7 +20,7 @@ public abstract class Entity {
 		this.l = l;
 	}
 	
-	public abstract void render(Screen screen, Camera cam);
+	public abstract void render(GameScreen screen, Camera cam);
 	
 	public double distanceFrom(Entity e){
 		float xE = e.x;

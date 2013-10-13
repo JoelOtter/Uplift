@@ -14,7 +14,7 @@ import com.badlogic.gdx.utils.Array;
 
 import es.bearwav.uplift.Input;
 import es.bearwav.uplift.level.Level;
-import es.bearwav.uplift.screen.Screen;
+import es.bearwav.uplift.screen.GameScreen;
 
 public class Player extends Entity {
 
@@ -105,15 +105,19 @@ public class Player extends Entity {
 	}
 
 	@Override
-	public void render(Screen screen, Camera cam) {
+	public void render(GameScreen screen, Camera cam) {
 		float time = Gdx.graphics.getDeltaTime();
 		stateTime += time;
-		if (takingDamage) damageTime += time;
+		if (takingDamage){
+			damageTime += time;
+			screen.setColor(1, 0, 0, 1);
+		}
 		if (isAttacking) attackTime += time;
 		if (direction == 0) {
 			lightning.render(screen, cam);
 		}
 		screen.draw(currentFrame, x, y, w * playerScale, h * playerScale, 0);
+		screen.resetColor();
 		if (direction != 0){
 			lightning.render(screen, cam);
 		}

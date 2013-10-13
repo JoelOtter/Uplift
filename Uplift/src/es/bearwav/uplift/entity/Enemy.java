@@ -10,13 +10,13 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Array;
 
 import es.bearwav.uplift.Input;
 import es.bearwav.uplift.level.Level;
-import es.bearwav.uplift.screen.Screen;
+import es.bearwav.uplift.screen.GameScreen;
 
 public class Enemy extends Entity {
 
@@ -101,16 +101,19 @@ public class Enemy extends Entity {
 	}
 
 	@Override
-	public void render(Screen screen, Camera cam) {
+	public void render(GameScreen screen, Camera cam) {
 		if (alive) {
 			float time = Gdx.graphics.getDeltaTime();
 			stateTime += time;
-			if (takingDamage)
+			if (takingDamage) {
 				damageTime += time;
+				screen.setColor(1, 0, 0, 1);
+			}
 			else
 				directionTime += time;
 		}
 		screen.draw(currentFrame, x, y, w * enemyScale, h * enemyScale, 0);
+		screen.resetColor();
 		x = body.getPosition().x - (w * enemyScale) / 2;
 		y = body.getPosition().y - (h * enemyScale) / 2;
 	}
@@ -123,6 +126,10 @@ public class Enemy extends Entity {
 					takingDamage = false;
 					damageTime = 0;
 					directionTime = changeRate;
+					if (hp <=0){
+						die();
+						return;
+					}
 				}
 			} else if (!attacking) {
 				if (directionTime >= changeRate) {
@@ -199,9 +206,7 @@ public class Enemy extends Entity {
 	}
 	
 	public void damage(int dir){
-		if (--hp <= 0){
-			die();
-		}
+		hp--;
 		takingDamage = true;
 		damageDirection = dir;
 	}
@@ -212,6 +217,7 @@ public class Enemy extends Entity {
 		velocity.y = 0;
 		currentFrame = utilityFrames.get(0);
 		l.world.destroyBody(body);
+		l.spawnItem(x, y, 0, true);
 	}
 	
 	private void setVelocityDamage(){

@@ -3,6 +3,7 @@ package es.bearwav.uplift.screen;
 import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.utils.Array;
@@ -37,6 +38,14 @@ public class GameScreen extends Screen{
 			}
 			spriteBatch.end();
 		}
+	}
+	
+	public void setColor(float r, float g, float b, float a){
+		spriteBatch.setColor(r, g, b, a);
+	}
+	
+	public void resetColor(){
+		spriteBatch.setColor(Color.WHITE);
 	}
 	
 	@Override

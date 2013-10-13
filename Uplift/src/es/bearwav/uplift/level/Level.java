@@ -37,6 +37,7 @@ import es.bearwav.uplift.Stats;
 import es.bearwav.uplift.entity.Door;
 import es.bearwav.uplift.entity.Enemy;
 import es.bearwav.uplift.entity.Entity;
+import es.bearwav.uplift.entity.Item;
 import es.bearwav.uplift.entity.Npc;
 import es.bearwav.uplift.entity.Player;
 import es.bearwav.uplift.screen.GameScreen;
@@ -46,6 +47,7 @@ public class Level {
 	public TiledMap map;
 	private OrthogonalTiledMapRenderer renderer;
 	private ArrayList<Entity> entities;
+	private ArrayList<Item> itemQueue;
 	private OrthographicCamera cam;
 	private GameScreen screen;
 	private Player player;
@@ -66,6 +68,7 @@ public class Level {
 		this.cam = cam;
 		this.screen = s;
 		entities = new ArrayList<Entity>();
+		itemQueue = new ArrayList<Item>();
 		world = new World(new Vector2(0, 0), true);
 		createContactListener();
 		try {
@@ -153,6 +156,7 @@ public class Level {
 				GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		renderer.setView(cam);
 		renderer.render(new int[] { 0, 1 });
+		spawnItemQueue();
 		screen.spriteBatch.setProjectionMatrix(cam.combined);
 		screen.spriteBatch.begin();
 		for (Entity e : entities) {
@@ -324,6 +328,16 @@ public class Level {
 			public void postSolve(Contact contact, ContactImpulse impulse) {
 			}	
 		});
+	}
+	
+	public void spawnItem(float x, float y, int type, boolean temp){
+		itemQueue.add(new Item(x, y, this, type, temp));
+	}
+	
+	private void spawnItemQueue(){
+		while (itemQueue.size() > 0){
+			entities.add(entities.indexOf(player), itemQueue.remove(0));
+		}
 	}
 	
 	public void enableConv(Npc conv){

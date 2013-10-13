@@ -11,7 +11,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Array;
 
 import es.bearwav.uplift.level.Level;
-import es.bearwav.uplift.screen.Screen;
+import es.bearwav.uplift.screen.GameScreen;
 
 public class Npc extends Entity{
 	
@@ -67,7 +67,7 @@ public class Npc extends Entity{
 	}
 
 	@Override
-	public void render(Screen screen, Camera cam) {
+	public void render(GameScreen screen, Camera cam) {
 		stateTime += Gdx.graphics.getDeltaTime();
 		screen.draw(currentFrame, x, y, w * npcScale, h * npcScale, 0);
 	}
