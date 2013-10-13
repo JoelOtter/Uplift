@@ -2,6 +2,7 @@ package es.bearwav.uplift.screen;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import es.bearwav.uplift.GdxGame;
 import es.bearwav.uplift.Input;
@@ -9,11 +10,13 @@ import es.bearwav.uplift.Input;
 public abstract class Screen {
 	
 	public SpriteBatch spriteBatch;
+	public ShapeRenderer shapeRenderer;
 	public GdxGame game;
 	
 	public void init(GdxGame game){
 		this.game = game;
 		spriteBatch = new SpriteBatch(10);
+		shapeRenderer = new ShapeRenderer();
 	}
 	
 	public void remove(){

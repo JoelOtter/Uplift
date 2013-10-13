@@ -6,6 +6,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.Array;
 
 import es.bearwav.uplift.GdxGame;
@@ -21,22 +23,30 @@ public class GameScreen extends Screen{
 	private String convBuf = "000ready";
 	private GdxGame game;
 	private BitmapFont font;
+	private String currentText = "";
+	
+	private static final int NUM_LINES_TEXT = 2;
 	
 	@Override
 	public void render() {
+		float h = Gdx.graphics.getHeight();
+		float w = Gdx.graphics.getWidth();
 		if (!loading){
 			level.render();
 			//Controls
 			//HUD
-			spriteBatch.setProjectionMatrix(game.camera.projection);
-			spriteBatch.begin();
 			if (convBuf != "000ready"){
-				font.drawWrapped(spriteBatch, convBuf,
-					-Gdx.graphics.getWidth()/2 + Gdx.graphics.getWidth()/100,
-					Gdx.graphics.getHeight()/2 - Gdx.graphics.getHeight()/70,
-					Gdx.graphics.getWidth());
+				float fontH = font.getBounds("A").height * 2;
+				shapeRenderer.setProjectionMatrix(game.camera.projection);
+				shapeRenderer.begin(ShapeType.Filled);
+				shapeRenderer.setColor(0, 0, 0, 1);
+				shapeRenderer.rect(-w/2, h/2 - (fontH * 1.1f * NUM_LINES_TEXT), w, fontH * 1.1f * NUM_LINES_TEXT);
+				shapeRenderer.end();
+				spriteBatch.setProjectionMatrix(game.camera.projection);
+				spriteBatch.begin();
+				font.drawWrapped(spriteBatch, currentText, -w/2 + w/100, h/2 - h/70,w);
+				spriteBatch.end();
 			}
-			spriteBatch.end();
 		}
 	}
 	
@@ -95,6 +105,10 @@ public class GameScreen extends Screen{
 			game.getInput().setDirectionsDisabled(true);
 			convBuf = conversation;
 		}
+		if (!convBuf.isEmpty()){
+			currentText = calculatePage(convBuf);
+			System.out.println(convBuf);
+		}
 		else endConversation(doAfter);
 	}
 	
@@ -105,5 +119,27 @@ public class GameScreen extends Screen{
 	
 	public Stats getStats(){ return game.getStats(); }
 	public Input getInput(){ return game.getInput(); }
+	
+	private String calculatePage(String text){
+		for (int i = text.length(); i > 0; i--){
+			float width = font.getBounds(text, 0, i).width;
+			if (width < Gdx.graphics.getWidth() * NUM_LINES_TEXT * 0.95f){
+				if (i == text.length()){
+					convBuf = text.substring(i);
+					return text.substring(0, i);
+				}
+				else {
+					//Find previous space
+					for (int j = i - 1; j > 0; j--){
+						if (text.charAt(j) == ' '){
+							convBuf = text.substring(j + 1);
+							return text.substring(0, j);
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
 
 }
