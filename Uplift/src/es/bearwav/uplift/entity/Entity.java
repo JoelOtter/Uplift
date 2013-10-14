@@ -32,9 +32,6 @@ public abstract class Entity {
 	public void tick(Input input){
 		
 	}
-	
-	public float getX() { return x; }
-	public float getY() { return y; }
 	public float getWidth() { return w; }
 	public float getHeight() { return h; }
 	

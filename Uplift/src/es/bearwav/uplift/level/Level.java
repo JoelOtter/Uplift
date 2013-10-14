@@ -282,7 +282,7 @@ public class Level {
 	}
 
 	public void fixCamera() {
-		cam.position.set(player.getX() + player.getWidth() / 2, player.getY()
+		cam.position.set(player.x + player.getWidth() / 2, player.y
 				+ player.getHeight() / 2, 0);
 		cam.update();
 		if (cam.frustum.boundsInFrustum(leftBound)

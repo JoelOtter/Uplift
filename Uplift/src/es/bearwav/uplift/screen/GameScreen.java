@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Array;
 import es.bearwav.uplift.GdxGame;
 import es.bearwav.uplift.Input;
 import es.bearwav.uplift.Stats;
+import es.bearwav.uplift.entity.Entity;
 import es.bearwav.uplift.entity.Interactable;
 import es.bearwav.uplift.entity.Npc;
 import es.bearwav.uplift.level.Level;
@@ -28,6 +29,7 @@ public class GameScreen extends Screen{
 	private String currentText = "";
 	private Texture overlayTex;
 	private TextureRegion overlay;
+	private Color overlayColor;
 	
 	private static final int NUM_LINES_TEXT = 2;
 	
@@ -38,9 +40,11 @@ public class GameScreen extends Screen{
 		if (!loading){
 			level.render();
 			spriteBatch.setProjectionMatrix(game.camera.projection);
+			spriteBatch.setColor(overlayColor);
 			spriteBatch.begin();
 			draw(overlay, -w/2, -h/2, w, h, 0);
 			spriteBatch.end();
+			resetColor();
 			//Controls
 			//HUD
 			if (convBuf != "000ready"){
@@ -66,6 +70,10 @@ public class GameScreen extends Screen{
 		spriteBatch.setColor(Color.WHITE);
 	}
 	
+	public void setOverlayColor(float r, float g, float b, float a){
+		overlayColor.set(r, g, b, a);
+	}
+	
 	@Override
 	public void tick(Input input){
 		if (!loading) level.tick(input);
@@ -89,6 +97,7 @@ public class GameScreen extends Screen{
 		generator.dispose();
 		overlayTex = new Texture(Gdx.files.internal("gfx/overlay.png"));
 		overlay = new TextureRegion(overlayTex);
+		overlayColor = new Color(1, 1, 1, 1);
 		loading = false;
 	}
 	
@@ -107,10 +116,11 @@ public class GameScreen extends Screen{
 		if (!convBuf.isEmpty()){
 			currentText = calculatePage(convBuf);
 		}
-		else endConversation("");
+		else endConversation("", inter);
 	}
 
 	public void processConversation(Npc npc) {
+		npc.activate();
 		int questNum = this.game.getStats().getQuest(npc.quest);
 		Iterator<?> convIter = npc.convs.iterator();
 		String conversation = "ERROR: Quest mismatch.";
@@ -129,12 +139,13 @@ public class GameScreen extends Screen{
 		if (!convBuf.isEmpty()){
 			currentText = calculatePage(convBuf);
 		}
-		else endConversation(doAfter);
+		else endConversation(doAfter, npc);
 	}
 	
-	private void endConversation(String action){
+	private void endConversation(String action, Entity ent){
 		game.getInput().setDirectionsDisabled(false);
 		convBuf = "000ready";
+		if (ent instanceof Npc) ((Npc) ent).release();
 	}
 	
 	public Stats getStats(){ return game.getStats(); }

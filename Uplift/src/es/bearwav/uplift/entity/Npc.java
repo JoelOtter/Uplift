@@ -83,6 +83,27 @@ public class Npc extends Entity{
 	public void endContact(Object collider){
 	}
 	
+	public void activate(){
+		float pX = l.player.x;
+		float pY = l.player.y;
+		if (pX >= x + w){
+			currentFrame = right;
+		}
+		else if (pX <= x - (l.player.w * Player.playerScale)){
+			currentFrame = left;
+		}
+		else if (pY >= y + (l.player.h * Player.playerScale)){
+			currentFrame = up;
+		}
+		else{
+			currentFrame = down;
+		}
+	}
+	
+	public void release(){
+		currentFrame = down;
+	}
+	
 	@Override
 	public String toString(){
 		return "Npc at " + x + ", " + y;

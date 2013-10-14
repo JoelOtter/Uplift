@@ -42,7 +42,7 @@ public class Player extends Entity {
 	private Animation upAnimation;
 	private Animation downAnimation;
 	private Body body;
-	private static final float playerScale = 0.6f;
+	public static final float playerScale = 0.6f;
 	private static final float boundHeight = 0.3f;
 	private boolean takingDamage = false;
 	private float damageTime;
@@ -246,8 +246,12 @@ public class Player extends Entity {
 	
 	@Override
 	public void endContact(Object collider){
-		l.currentNpc = null;
-		l.currentInteractable = null;
+		if (collider instanceof Npc){
+			l.currentNpc = null;
+		}
+		else if (collider instanceof Interactable){
+			l.currentInteractable = null;
+		}
 	}
 	
 	public void damage(int dir){
