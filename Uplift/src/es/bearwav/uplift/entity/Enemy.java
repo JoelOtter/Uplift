@@ -166,8 +166,7 @@ public class Enemy extends Entity {
 
 	@Override
 	public void remove() {
-		// TODO Auto-generated method stub
-
+		enemyTex.dispose();
 	}
 
 	@Override

@@ -4,15 +4,17 @@ import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.Array;
 
 import es.bearwav.uplift.GdxGame;
 import es.bearwav.uplift.Input;
 import es.bearwav.uplift.Stats;
+import es.bearwav.uplift.entity.Interactable;
 import es.bearwav.uplift.entity.Npc;
 import es.bearwav.uplift.level.Level;
 
@@ -24,6 +26,8 @@ public class GameScreen extends Screen{
 	private GdxGame game;
 	private BitmapFont font;
 	private String currentText = "";
+	private Texture overlayTex;
+	private TextureRegion overlay;
 	
 	private static final int NUM_LINES_TEXT = 2;
 	
@@ -33,6 +37,10 @@ public class GameScreen extends Screen{
 		float w = Gdx.graphics.getWidth();
 		if (!loading){
 			level.render();
+			spriteBatch.setProjectionMatrix(game.camera.projection);
+			spriteBatch.begin();
+			draw(overlay, -w/2, -h/2, w, h, 0);
+			spriteBatch.end();
 			//Controls
 			//HUD
 			if (convBuf != "000ready"){
@@ -44,7 +52,7 @@ public class GameScreen extends Screen{
 				shapeRenderer.end();
 				spriteBatch.setProjectionMatrix(game.camera.projection);
 				spriteBatch.begin();
-				font.drawWrapped(spriteBatch, currentText, -w/2 + w/100, h/2 - h/70,w);
+				font.drawWrapped(spriteBatch, currentText, -w/2 + w/100, h/2 - h/55, w * 0.99f);
 				spriteBatch.end();
 			}
 		}
@@ -79,6 +87,8 @@ public class GameScreen extends Screen{
 		font.setColor(1f, 1f, 1f, 1f);
 		System.out.println(font.computeVisibleGlyphs(convBuf, 0, 10, 50));
 		generator.dispose();
+		overlayTex = new Texture(Gdx.files.internal("gfx/overlay.png"));
+		overlay = new TextureRegion(overlayTex);
 		loading = false;
 	}
 	
@@ -87,6 +97,17 @@ public class GameScreen extends Screen{
 		l.remove();
 		this.level = new Level(to, door, this, game.getCam());
 		loading = false;
+	}
+	
+	public void processInteraction(Interactable inter){
+		if (convBuf == "000ready") {
+			game.getInput().setDirectionsDisabled(true);
+			convBuf = inter.interact();
+		}
+		if (!convBuf.isEmpty()){
+			currentText = calculatePage(convBuf);
+		}
+		else endConversation("");
 	}
 
 	public void processConversation(Npc npc) {
@@ -107,7 +128,6 @@ public class GameScreen extends Screen{
 		}
 		if (!convBuf.isEmpty()){
 			currentText = calculatePage(convBuf);
-			System.out.println(convBuf);
 		}
 		else endConversation(doAfter);
 	}
@@ -123,7 +143,7 @@ public class GameScreen extends Screen{
 	private String calculatePage(String text){
 		for (int i = text.length(); i > 0; i--){
 			float width = font.getBounds(text, 0, i).width;
-			if (width < Gdx.graphics.getWidth() * NUM_LINES_TEXT * 0.95f){
+			if (width < Gdx.graphics.getWidth() * NUM_LINES_TEXT * 0.94f){
 				if (i == text.length()){
 					convBuf = text.substring(i);
 					return text.substring(0, i);

@@ -237,13 +237,17 @@ public class Player extends Entity {
 	@Override
 	public void collide(Object collider) {
 		if (collider instanceof Npc){
-			l.enableConv((Npc) collider);
+			l.currentNpc = (Npc) collider;
+		}
+		else if (collider instanceof Interactable){
+			l.currentInteractable = (Interactable) collider;
 		}
 	}
 	
 	@Override
 	public void endContact(Object collider){
 		l.currentNpc = null;
+		l.currentInteractable = null;
 	}
 	
 	public void damage(int dir){

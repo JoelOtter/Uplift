@@ -149,6 +149,39 @@ class NewEnemyDialog(Gtk.Dialog):
         box.pack_start(HPBox, False, False, 0)
         self.show_all()
 
+class NewInteractableDialog(Gtk.Dialog):
+
+    def __init__(self, parent):
+        Gtk.Dialog.__init__(self, "New Interactable", parent, 0,
+            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+             Gtk.STOCK_OK, Gtk.ResponseType.OK))
+        box = self.get_content_area()
+        typeBox = Gtk.Box(spacing=2)
+        typeLabel = Gtk.Label("Type")
+        self.typeEntry = Gtk.Entry()
+        XBox = Gtk.Box(spacing=2)
+        XLabel = Gtk.Label("X")
+        self.XEntry = Gtk.Entry()
+        YBox = Gtk.Box(spacing=2)
+        YLabel = Gtk.Label("Y")
+        self.YEntry = Gtk.Entry()
+        conBox = Gtk.Box(spacing=2)
+        conLabel = Gtk.Label("Contents")
+        self.conEntry = Gtk.Entry()
+        typeBox.pack_start(typeLabel, False, False, 2)
+        typeBox.pack_start(self.typeEntry, True, True, 2)
+        XBox.pack_start(XLabel, False, False, 2)
+        XBox.pack_start(self.XEntry, True, True, 2)
+        YBox.pack_start(YLabel, False, False, 2)
+        YBox.pack_start(self.YEntry, True, True, 2)
+        conBox.pack_start(conLabel, False, False, 2)
+        conBox.pack_start(self.conEntry, True, True, 2)
+        box.pack_start(typeBox, False, False, 0)
+        box.pack_start(XBox, False, False, 0)
+        box.pack_start(YBox, False, False, 0)
+        box.pack_start(conBox, False, False, 0)
+        self.show_all()
+
 class ConversationDialog(Gtk.Dialog):
 
     convs = None
@@ -264,9 +297,11 @@ class LevelWindow(Gtk.Window):
     doors = []
     entities = []
     enemies = []
+    interactables = []
     selectedDoor = []
     selectedEnt = []
     selectedEnemy = []
+    selectedInteractable = []
 
     def __init__(self):
         Gtk.Window.__init__(self, title="Uplift Level Designer")
@@ -352,6 +387,21 @@ class LevelWindow(Gtk.Window):
         self.enemyTree.connect("row-activated", self.enemy_row_activated)
         self.create_enemy_columns(self.enemyTree)
 
+        #Interactables
+        self.interactableBox = Gtk.Box(spacing=5)
+        self.interactableLabel = Gtk.Label("<b>Interactables</b>")
+        self.interactableLabel.set_use_markup(True)
+        self.interactableLabel.set_alignment(0, 0)
+        self.interactableNewButton = Gtk.ToolButton(stock_id=Gtk.STOCK_NEW, label="New Interactable")
+        self.interactableNewButton.connect("clicked", self.new_interactable)
+        self.interactableDelButton = Gtk.ToolButton(stock_id=Gtk.STOCK_DELETE, label="Remove Interactable")
+        self.interactableDelButton.set_sensitive(False)
+        self.interactableDelButton.connect("clicked", self.on_interactable_del_clicked)
+        self.interactableTree = Gtk.TreeView(self.create_interactable_model())
+        self.interactableTree.set_rules_hint(True)
+        self.interactableTree.get_selection().connect("changed", self.on_interactable_selection_changed)
+        self.create_interactable_columns(self.interactableTree)
+
         self.box.pack_start(self.infobox, True, True, 5)
         self.infobox.pack_start(self.infoTitle, False, False, 5)
         self.infobox.pack_start(self.infoscroll, True, True, 2)
@@ -374,6 +424,12 @@ class LevelWindow(Gtk.Window):
         self.enemyBox.pack_start(self.enemyDelButton, False, False, 0)
         self.infoinner.pack_start(self.enemyBox, False, False, 5)
         self.infoinner.pack_start(self.enemyTree, False, False, 5)
+        self.infoinner.pack_start(Gtk.HSeparator(), False, False, 5)
+        self.interactableBox.pack_start(self.interactableLabel, True, True, 5)
+        self.interactableBox.pack_start(self.interactableNewButton, False, False, 0)
+        self.interactableBox.pack_start(self.interactableDelButton, False, False, 0)
+        self.infoinner.pack_start(self.interactableBox, False, False, 5)
+        self.infoinner.pack_start(self.interactableTree, False, False, 5)
 
     def create_model(self):
         listData = []
@@ -488,6 +544,30 @@ class LevelWindow(Gtk.Window):
         column.set_sort_column_id(4)
         treeView.append_column(column)
 
+    def create_interactable_model(self):
+        listData = []
+        for i in self.interactables:
+            if i != []: listData.append(((i[0], i[1], i[2], i[3])))
+        store = Gtk.ListStore(str, int, int, int)
+        for item in listData:
+            store.append(item)
+        return store
+
+    def create_interactable_columns(self, treeView):
+        rendererText = Gtk.CellRendererText()
+        column = Gtk.TreeViewColumn("Type", rendererText, text=0)
+        column.set_sort_column_id(0)
+        treeView.append_column(column)
+        column = Gtk.TreeViewColumn("X", rendererText, text=1)
+        column.set_sort_column_id(1)
+        treeView.append_column(column)
+        column = Gtk.TreeViewColumn("Y", rendererText, text=2)
+        column.set_sort_column_id(2)
+        treeView.append_column(column)
+        column = Gtk.TreeViewColumn("Contents", rendererText, text=3)
+        column.set_sort_column_id(3)
+        treeView.append_column(column)
+
     def on_tree_selection_changed(self, selection):
         model, treeiter = selection.get_selected()
         if treeiter != None:
@@ -526,6 +606,15 @@ class LevelWindow(Gtk.Window):
             self.selectedEnemy = outp
             self.enemyDelButton.set_sensitive(True)
 
+    def on_interactable_selection_changed(self, selection):
+        model, treeiter = selection.get_selected()
+        if treeiter != None:
+            outp = []
+            for i in model[treeiter]:
+                outp.append(i)
+            self.selectedInteractable = outp
+            self.interactableDelButton.set_sensitive(True)
+
     def npc_row_activated(treeview, iterr, path, data):
         dialog = ConversationDialog(treeview)
         response = dialog.run()
@@ -539,6 +628,9 @@ class LevelWindow(Gtk.Window):
     def on_enemy_del_clicked(self, button):
         self.delete_enemy(self.selectedEnemy)
 
+    def on_interactable_del_clicked(self, button):
+        self.delete_interactable(self.selectedInteractable)
+
     def get_level_info(self, lineNo):
         fp = open(levelsAddress)
         for i, line in enumerate(fp):
@@ -549,6 +641,7 @@ class LevelWindow(Gtk.Window):
                 self.doors = level[1]
                 self.entities = level[2]
                 self.enemies = level[3]
+                self.interactables = level[4]
                 break
         fp.close()
         self.rebuild()
@@ -600,6 +693,18 @@ class LevelWindow(Gtk.Window):
         dialog.destroy()
         self.rebuild()
 
+    def new_interactable(self, button):
+        dialog = NewInteractableDialog(self)
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            etype = dialog.typeEntry.get_text()
+            X = int(dialog.XEntry.get_text())
+            Y = int(dialog.YEntry.get_text())
+            con = int(dialog.conEntry.get_text())
+            self.interactables.append([etype, X, Y, con])
+        dialog.destroy()
+        self.rebuild()
+
     def delete_ent(self, ent):
         for i in self.entities:
             if (i == ent):
@@ -612,6 +717,12 @@ class LevelWindow(Gtk.Window):
                 self.enemies.remove(i)
         self.rebuild()
 
+    def delete_interactable(self, interactable):
+        for i in self.interactables:
+            if i == interactable:
+                self.interactables.remove(i)
+        self.rebuild()
+
     def rebuild(self):
         self.infoTitle.set_text("<span size='25000'><b>tmx/" + self.tileMap + ".tmx</b></span>")
         self.infoTitle.set_use_markup(True)
@@ -621,9 +732,12 @@ class LevelWindow(Gtk.Window):
         self.entTree.set_model(entMod)
         enemyMod = self.create_enemy_model()
         self.enemyTree.set_model(enemyMod)
+        interactableMod = self.create_interactable_model()
+        self.interactableTree.set_model(interactableMod)
         self.entDelButton.set_sensitive(False)
         self.doorDelButton.set_sensitive(False)
         self.enemyDelButton.set_sensitive(False)
+        self.interactableDelButton.set_sensitive(False)
         self.show_all()
 
     def open_in_tiled(self, button):
@@ -658,7 +772,7 @@ class LevelWindow(Gtk.Window):
         with open(levelsAddress, 'r') as ff:
             data = ff.readlines()
             ff.close()
-        data[lineNo] = json.dumps([self.tileMap, self.doors, self.entities, self.enemies]) + '\n'
+        data[lineNo] = json.dumps([self.tileMap, self.doors, self.entities, self.enemies, self.interactables]) + '\n'
         with open(levelsAddress, 'w') as ff:
             ff.writelines(data)
             ff.close()

@@ -51,4 +51,8 @@ public class Stats {
 		if (name == "MAIN") return mainquest;
 		else return 0;
 	}
+	
+	public void incQuest(String name){
+		if (name == "MAIN") mainquest++;
+	}
 }

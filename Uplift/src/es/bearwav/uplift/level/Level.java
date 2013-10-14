@@ -37,6 +37,7 @@ import es.bearwav.uplift.Stats;
 import es.bearwav.uplift.entity.Door;
 import es.bearwav.uplift.entity.Enemy;
 import es.bearwav.uplift.entity.Entity;
+import es.bearwav.uplift.entity.Interactable;
 import es.bearwav.uplift.entity.Item;
 import es.bearwav.uplift.entity.Npc;
 import es.bearwav.uplift.entity.Player;
@@ -50,7 +51,7 @@ public class Level {
 	private ArrayList<Item> itemQueue;
 	private OrthographicCamera cam;
 	private GameScreen screen;
-	private Player player;
+	public Player player;
 	private static final int TILE_HEIGHT = 64;
 	private static final int TILE_WIDTH = 64;
 	private BoundingBox topBound;
@@ -61,6 +62,7 @@ public class Level {
 	private Box2DDebugRenderer debugRenderer;
 	public float[] changeTo = {-1, -1};
 	public Npc currentNpc;
+	public Interactable currentInteractable;
 	private boolean buttonDown;
 	private boolean isCombatArea = false;
 
@@ -95,6 +97,7 @@ public class Level {
 		Array<?> doors = (Array<?>) levelData.get(1);
 		Array<?> npcs = (Array<?>) levelData.get(2);
 		Array<?> enemies = (Array<?>) levelData.get(3);
+		Array<?> interactables = (Array<?>) levelData.get(4);
 		buildTiles(tiles);
 
 		// Set up doors
@@ -126,6 +129,12 @@ public class Level {
 		while (enemyIter.hasNext()){
 			isCombatArea = true;
 			addEntity(new Enemy((Array<?>) enemyIter.next(), this));
+		}
+		
+		//NPCs
+		Iterator<?> interactableIter = interactables.iterator();
+		while (interactableIter.hasNext()){
+			addEntity(new Interactable((Array<?>) interactableIter.next(), this));
 		}
 		
 		//Player
@@ -164,7 +173,7 @@ public class Level {
 		}
 		screen.spriteBatch.end();
 		renderer.render(new int[] { 3 });
-		debugRenderer.render(world, cam.combined);
+		//debugRenderer.render(world, cam.combined);
 		fixCamera();
 		world.step(1/45f, 6, 2);
 		if (changeTo[0] != -1) change(changeTo[0], changeTo[1]);
@@ -340,14 +349,12 @@ public class Level {
 		}
 	}
 	
-	public void enableConv(Npc conv){
-		currentNpc = conv;
-		System.out.println(currentNpc);
-	}
-	
 	public void processButtonPress(){
 		if (currentNpc != null){
 			screen.processConversation(currentNpc);
+		}
+		else if (currentInteractable != null){
+			screen.processInteraction(currentInteractable);
 		}
 		else if (isCombatArea) {
 			player.attack();
