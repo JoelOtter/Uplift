@@ -36,6 +36,9 @@ public class Item extends Entity{
 		time = 0;
 		this.temp = temp;
 		
+		if (type == 0) l.getSounds().loadSound("heal.ogg");
+		else l.getSounds().loadSound("coin.ogg");
+		
 		//Physics
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyType.StaticBody;
@@ -66,7 +69,8 @@ public class Item extends Entity{
 
 	@Override
 	public void remove() {
-		tex.dispose();
+		if (type == 0) l.getSounds().unloadSound("heal.ogg");
+		else l.getSounds().unloadSound("coin.ogg");
 	}
 	
 	private void give(){
@@ -87,11 +91,13 @@ public class Item extends Entity{
 			l.getStats().incMoney(20);
 			break;
 		}
+		if (type == 0) l.getSounds().playSound("heal.ogg");
+		else l.getSounds().playSound("coin.ogg");
 	}
 
 	@Override
 	public void collide(Object collider) {
-		if (collider instanceof Player){
+		if (collider instanceof Player && exists){
 			exists = false;
 			give();
 		}

@@ -87,6 +87,8 @@ public class Player extends Entity {
 		damageTime = 0;
 		attackTime = 0;
 		
+		l.getSounds().loadSound("hurt.ogg");
+		
 		//Spells
 		lightning = new Lightning(x, y, l);
 		
@@ -127,6 +129,7 @@ public class Player extends Entity {
 
 	public void remove() {
 		playerTex.dispose();
+		l.getSounds().unloadSound("hurt.ogg");
 	}
 
 	public void tick(Input input) {
@@ -255,6 +258,7 @@ public class Player extends Entity {
 	}
 	
 	public void damage(int dir){
+		l.getSounds().playSound("hurt.ogg");
 		if (l.getStats().decHealth(10) <= 0){
 			die();
 		}

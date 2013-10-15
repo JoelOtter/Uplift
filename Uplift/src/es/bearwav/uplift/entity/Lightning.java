@@ -43,6 +43,8 @@ public class Lightning extends Entity{
 		stateTime = 0;
 		rotation = 0;
 		
+		l.getSounds().loadSound("lightning.ogg");
+		
 		//Physics
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyType.StaticBody;
@@ -75,6 +77,7 @@ public class Lightning extends Entity{
 		if (target != null){
 			target.damage(direction);
 		}
+		l.getSounds().playSound("lightning.ogg");
 	}
 	
 	public boolean isActive(){
@@ -111,6 +114,7 @@ public class Lightning extends Entity{
 	@Override
 	public void remove() {
 		tex.dispose();
+		l.getSounds().unloadSound("lightning.ogg");
 	}
 
 	@Override

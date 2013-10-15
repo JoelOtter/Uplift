@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.Array;
 
 import es.bearwav.uplift.GdxGame;
 import es.bearwav.uplift.Input;
+import es.bearwav.uplift.Sounds;
 import es.bearwav.uplift.Stats;
 import es.bearwav.uplift.entity.Entity;
 import es.bearwav.uplift.entity.Interactable;
@@ -82,7 +83,6 @@ public class GameScreen extends Screen{
 	public void remove(){
 		super.remove();
 		level.remove();
-		spriteBatch.dispose();
 	}
 	
 	public void init(GdxGame game){
@@ -93,7 +93,6 @@ public class GameScreen extends Screen{
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("game_over.ttf"));
 		font = generator.generateFont(70);
 		font.setColor(1f, 1f, 1f, 1f);
-		System.out.println(font.computeVisibleGlyphs(convBuf, 0, 10, 50));
 		generator.dispose();
 		overlayTex = new Texture(Gdx.files.internal("gfx/overlay.png"));
 		overlay = new TextureRegion(overlayTex);
@@ -150,6 +149,7 @@ public class GameScreen extends Screen{
 	
 	public Stats getStats(){ return game.getStats(); }
 	public Input getInput(){ return game.getInput(); }
+	public Sounds getSounds(){ return game.getSounds(); }
 	
 	private String calculatePage(String text){
 		for (int i = text.length(); i > 0; i--){

@@ -1,5 +1,7 @@
 package es.bearwav.uplift.entity;
 
+import java.util.Random;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Texture;
@@ -17,7 +19,7 @@ public class Npc extends Entity{
 	
 	private String tileset;
 	private float anim;
-	private float dir;
+	private int dir;
 	private float speed;
 	public String quest;
 	public Array<?> convs;
@@ -29,6 +31,8 @@ public class Npc extends Entity{
 	private float stateTime;
 	private TextureRegion currentFrame;
 	private Body body;
+	private boolean talking = false;
+	private Random rand = new Random();
 	
 	private static final float npcScale = 0.6f;
 
@@ -36,7 +40,7 @@ public class Npc extends Entity{
 		super((Float) data.get(1), (Float) data.get(2), l);
 		tileset = (String) data.get(0);
 		anim = (Float) data.get(3);
-		dir = (Float) data.get(4);
+		dir = Math.round((Float) data.get(4));
 		speed = (Float) data.get(5);
 		quest = (String) ((Array<?>) data.get(6)).get(0);
 		convs = (Array<?>) ((Array<?>) data.get(6)).get(1);
@@ -49,7 +53,7 @@ public class Npc extends Entity{
 		up = tmp[0][1];
 		right = tmp[1][1];
 		left = tmp[2][1];
-		currentFrame = down;
+		currentFrame = chooseDirection(dir);
 		stateTime = 0;
 		
 		//Physics
@@ -68,7 +72,13 @@ public class Npc extends Entity{
 
 	@Override
 	public void render(GameScreen screen, Camera cam) {
-		stateTime += Gdx.graphics.getDeltaTime();
+		if (!talking && (anim>0)) {
+			stateTime += Gdx.graphics.getDeltaTime();
+		}
+		if (stateTime > speed){
+			stateTime = 0;
+			currentFrame = chooseDirection(rand.nextInt(4));
+		}
 		screen.draw(currentFrame, x, y, w * npcScale, h * npcScale, 0);
 	}
 
@@ -84,6 +94,7 @@ public class Npc extends Entity{
 	}
 	
 	public void activate(){
+		talking = true;
 		float pX = l.player.x;
 		float pY = l.player.y;
 		if (pX >= x + w){
@@ -101,12 +112,23 @@ public class Npc extends Entity{
 	}
 	
 	public void release(){
-		currentFrame = down;
+		talking = false;
+		currentFrame = chooseDirection(dir);
 	}
 	
 	@Override
 	public String toString(){
 		return "Npc at " + x + ", " + y;
+	}
+	
+	private TextureRegion chooseDirection(int dir){
+		switch (dir){
+		case 0: return up;
+		case 1: return right;
+		case 2: return down;
+		case 3: return left;
+		}
+		return down;
 	}
 
 }

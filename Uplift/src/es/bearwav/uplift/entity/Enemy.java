@@ -216,7 +216,7 @@ public class Enemy extends Entity {
 		velocity.y = 0;
 		currentFrame = utilityFrames.get(0);
 		l.world.destroyBody(body);
-		l.spawnItem(x, y, 0, true);
+		l.spawnItem(x, y, 1, true);
 	}
 	
 	private void setVelocityDamage(){

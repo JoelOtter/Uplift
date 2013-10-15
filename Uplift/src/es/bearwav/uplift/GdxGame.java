@@ -13,6 +13,7 @@ public class GdxGame implements ApplicationListener {
 	private Stats stats;
 	private Input input;
 	private Screen screen;
+	private Sounds sounds;
 
 	@Override
 	public void create() {
@@ -24,15 +25,17 @@ public class GdxGame implements ApplicationListener {
 		camera.update();
 
 		stats = new Stats(100, 0, 0);
-		setScreen(new GameScreen());
 		input = new Input();
+		sounds = new Sounds();
+		setScreen(new GameScreen());
 		Gdx.input.setInputProcessor(input);
 		Gdx.graphics.setVSync(true);
 	}
 
 	@Override
 	public void dispose() {
-		
+		screen.remove();
+		sounds.remove();
 	}
 
 	@Override
@@ -62,6 +65,10 @@ public class GdxGame implements ApplicationListener {
 	
 	public Input getInput(){
 		return input;
+	}
+	
+	public Sounds getSounds(){
+		return sounds;
 	}
 	
 	private void setScreen(Screen scr){

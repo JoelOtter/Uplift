@@ -33,6 +33,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 
 import es.bearwav.uplift.Input;
+import es.bearwav.uplift.Sounds;
 import es.bearwav.uplift.Stats;
 import es.bearwav.uplift.entity.Door;
 import es.bearwav.uplift.entity.Enemy;
@@ -94,10 +95,12 @@ public class Level {
 		Json js = new Json();
 		ArrayList<?> levelData = js.fromJson(ArrayList.class, levelLine);
 		String tiles = "tmx/" + (String) levelData.get(0) + ".tmx";
-		Array<?> doors = (Array<?>) levelData.get(1);
-		Array<?> npcs = (Array<?>) levelData.get(2);
-		Array<?> enemies = (Array<?>) levelData.get(3);
-		Array<?> interactables = (Array<?>) levelData.get(4);
+		String music = (String) levelData.get(1);
+		screen.getSounds().setMusic(music);
+		Array<?> doors = (Array<?>) levelData.get(2);
+		Array<?> npcs = (Array<?>) levelData.get(3);
+		Array<?> enemies = (Array<?>) levelData.get(4);
+		Array<?> interactables = (Array<?>) levelData.get(5);
 		buildTiles(tiles);
 
 		// Set up doors
@@ -363,5 +366,6 @@ public class Level {
 	
 	public Stats getStats(){ return screen.getStats(); }
 	public Input getInput(){ return screen.getInput(); }
+	public Sounds getSounds(){ return screen.getSounds(); }
 
 }
