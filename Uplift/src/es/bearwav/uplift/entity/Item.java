@@ -9,7 +9,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
-import es.bearwav.uplift.level.Level;
+import es.bearwav.uplift.level.GroundLevel;
 import es.bearwav.uplift.screen.GameScreen;
 
 public class Item extends Entity{
@@ -25,7 +25,7 @@ public class Item extends Entity{
 	private static final float scale = 0.25f;
 	private static final float timeDisp = 5;
 
-	public Item(float x, float y, Level l, int type, boolean temp) {
+	public Item(float x, float y, GroundLevel l, int type, boolean temp) {
 		super(x, y, l);
 		tex = new Texture(Gdx.files.internal("gfx/items.png"));
 		this.w = tex.getWidth()/2;

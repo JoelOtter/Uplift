@@ -18,6 +18,7 @@ import es.bearwav.uplift.Stats;
 import es.bearwav.uplift.entity.Entity;
 import es.bearwav.uplift.entity.Interactable;
 import es.bearwav.uplift.entity.Npc;
+import es.bearwav.uplift.level.GroundLevel;
 import es.bearwav.uplift.level.Level;
 
 public class GameScreen extends Screen{
@@ -89,7 +90,7 @@ public class GameScreen extends Screen{
 		loading = true;
 		this.game = game;
 		super.init(this.game);
-		level = new Level(0, 0, this, this.game.getCam());
+		level = new GroundLevel(0, 0, this, this.game.getCam());
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("game_over.ttf"));
 		font = generator.generateFont(70);
 		font.setColor(1f, 1f, 1f, 1f);
@@ -103,7 +104,7 @@ public class GameScreen extends Screen{
 	public void changeLevel(Level l, float to, float door){
 		loading = true;
 		l.remove();
-		this.level = new Level(to, door, this, game.getCam());
+		this.level = new GroundLevel(to, door, this, game.getCam());
 		loading = false;
 	}
 	

@@ -7,7 +7,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
-import es.bearwav.uplift.level.Level;
+import es.bearwav.uplift.level.GroundLevel;
 import es.bearwav.uplift.screen.GameScreen;
 
 public class Door extends Entity{
@@ -20,7 +20,7 @@ public class Door extends Entity{
 	private Body body;
 	private boolean up = false;
 
-	public Door(float x, float y, int w, int h, Level l) {
+	public Door(float x, float y, int w, int h, GroundLevel l) {
 		super(x, y, l);
 		this.x = x;
 		this.y = y;

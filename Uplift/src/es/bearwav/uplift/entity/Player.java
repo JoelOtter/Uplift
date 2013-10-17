@@ -13,7 +13,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Array;
 
 import es.bearwav.uplift.Input;
-import es.bearwav.uplift.level.Level;
+import es.bearwav.uplift.level.GroundLevel;
 import es.bearwav.uplift.screen.GameScreen;
 
 public class Player extends Entity {
@@ -51,7 +51,7 @@ public class Player extends Entity {
 	private float attackTime;
 	private Lightning lightning;
 
-	public Player(float x, float y, Level l) {
+	public Player(float x, float y, GroundLevel l) {
 		super(x, y, l);
 		velocity = new Vector2(0, 0);
 		playerTex = new Texture(Gdx.files.internal("gfx/playergrid.png"));
@@ -240,20 +240,20 @@ public class Player extends Entity {
 	@Override
 	public void collide(Object collider) {
 		if (collider instanceof Npc){
-			l.currentNpc = (Npc) collider;
+			((GroundLevel) l).currentNpc = (Npc) collider;
 		}
 		else if (collider instanceof Interactable){
-			l.currentInteractable = (Interactable) collider;
+			((GroundLevel) l).currentInteractable = (Interactable) collider;
 		}
 	}
 	
 	@Override
 	public void endContact(Object collider){
 		if (collider instanceof Npc){
-			l.currentNpc = null;
+			((GroundLevel) l).currentNpc = null;
 		}
 		else if (collider instanceof Interactable){
-			l.currentInteractable = null;
+			((GroundLevel) l).currentInteractable = null;
 		}
 	}
 	

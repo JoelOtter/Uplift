@@ -12,7 +12,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Array;
 
-import es.bearwav.uplift.level.Level;
+import es.bearwav.uplift.level.GroundLevel;
 import es.bearwav.uplift.screen.GameScreen;
 
 public class Npc extends Entity{
@@ -36,7 +36,7 @@ public class Npc extends Entity{
 	
 	private static final float npcScale = 0.6f;
 
-	public Npc(Array<?> data, Level l) {
+	public Npc(Array<?> data, GroundLevel l) {
 		super((Float) data.get(1), (Float) data.get(2), l);
 		tileset = (String) data.get(0);
 		anim = (Float) data.get(3);
@@ -95,15 +95,15 @@ public class Npc extends Entity{
 	
 	public void activate(){
 		talking = true;
-		float pX = l.player.x;
-		float pY = l.player.y;
+		float pX = ((GroundLevel) l).player.x;
+		float pY = ((GroundLevel) l).player.y;
 		if (pX >= x + w){
 			currentFrame = right;
 		}
-		else if (pX <= x - (l.player.w * Player.playerScale)){
+		else if (pX <= x - (((GroundLevel) l).player.w * Player.playerScale)){
 			currentFrame = left;
 		}
-		else if (pY >= y + (l.player.h * Player.playerScale)){
+		else if (pY >= y + (((GroundLevel) l).player.h * Player.playerScale)){
 			currentFrame = up;
 		}
 		else{

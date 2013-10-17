@@ -12,7 +12,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Array;
 
-import es.bearwav.uplift.level.Level;
+import es.bearwav.uplift.level.GroundLevel;
 import es.bearwav.uplift.screen.GameScreen;
 
 public class Interactable extends Entity{
@@ -27,7 +27,7 @@ public class Interactable extends Entity{
 	
 	private static final float scale = 1;
 
-	public Interactable(Array<?> data, Level l) {
+	public Interactable(Array<?> data, GroundLevel l) {
 		super((Float) data.get(1), (Float) data.get(2), l);
 		type = (String) data.get(0);
 		contents = Math.round((Float) data.get(3));
@@ -82,7 +82,7 @@ public class Interactable extends Entity{
 			open = true;
 			switch (contents){
 			case 0:
-				new Item(x, y, l, contents, false).collide(l.player);
+				new Item(x, y, ((GroundLevel) l), contents, false).collide(((GroundLevel) l).player);
 				return "The chest contains a heart. Useful.";
 			}
 		}

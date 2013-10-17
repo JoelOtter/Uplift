@@ -15,7 +15,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Array;
 
 import es.bearwav.uplift.Input;
-import es.bearwav.uplift.level.Level;
+import es.bearwav.uplift.level.GroundLevel;
 import es.bearwav.uplift.screen.GameScreen;
 
 public class Enemy extends Entity {
@@ -51,7 +51,7 @@ public class Enemy extends Entity {
 	private float damageTime;
 	private boolean alive = true;
 
-	public Enemy(Array<?> data, Level l) {
+	public Enemy(Array<?> data, GroundLevel l) {
 		super((Float) data.get(2), (Float) data.get(3), l);
 		type = (String) data.get(0);
 		tileset = (String) data.get(1);
@@ -215,8 +215,8 @@ public class Enemy extends Entity {
 		velocity.x = 0;
 		velocity.y = 0;
 		currentFrame = utilityFrames.get(0);
-		l.world.destroyBody(body);
-		l.spawnItem(x, y, 1, true);
+		((GroundLevel) l).world.destroyBody(body);
+		((GroundLevel) l).spawnItem(x, y, 1, true);
 	}
 	
 	private void setVelocityDamage(){

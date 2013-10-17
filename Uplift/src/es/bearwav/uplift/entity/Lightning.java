@@ -12,7 +12,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Array;
 
-import es.bearwav.uplift.level.Level;
+import es.bearwav.uplift.level.GroundLevel;
 import es.bearwav.uplift.screen.GameScreen;
 
 public class Lightning extends Entity{
@@ -31,7 +31,7 @@ public class Lightning extends Entity{
 	private static final float ANIM_SPEED = 0.25f;
 	private static final float ATTACK_LENGTH = 0.5f;
 
-	public Lightning(float x, float y, Level l) {
+	public Lightning(float x, float y, GroundLevel l) {
 		super(x, y, l);
 		frames = new Array<TextureRegion>();
 		tex = new Texture(Gdx.files.internal("gfx/lightning.png"));
