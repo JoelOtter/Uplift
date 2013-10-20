@@ -2,14 +2,13 @@ package es.bearwav.uplift;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.GL20;
 
 import es.bearwav.uplift.screen.GameScreen;
 import es.bearwav.uplift.screen.Screen;
 
 public class GdxGame implements ApplicationListener {
 	
-	public OrthographicCamera camera;
 	private Stats stats;
 	private Input input;
 	private Screen screen;
@@ -17,13 +16,6 @@ public class GdxGame implements ApplicationListener {
 
 	@Override
 	public void create() {
-		float w = Gdx.graphics.getWidth();
-		float h = Gdx.graphics.getHeight();
-
-		camera = new OrthographicCamera();
-		camera.setToOrtho(false, w, h);
-		camera.update();
-
 		stats = new Stats(100, 0, 0);
 		input = new Input();
 		sounds = new Sounds();
@@ -40,14 +32,16 @@ public class GdxGame implements ApplicationListener {
 
 	@Override
 	public void render() {
+		Gdx.graphics.getGL20().glClearColor(0, 0, 0, 1);
+		Gdx.graphics.getGL20().glClear(
+				GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		screen.tick(input);
 		screen.render();
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		camera.setToOrtho(false, width, height);
-		camera.update();
+		screen.resize(width, height);
 	}
 
 	@Override
@@ -75,9 +69,5 @@ public class GdxGame implements ApplicationListener {
 		if (screen != null) screen.remove();
 		screen = scr;
 		if (screen != null) screen.init(this);
-	}
-	
-	public OrthographicCamera getCam(){
-		return camera;
 	}
 }

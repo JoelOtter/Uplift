@@ -765,7 +765,7 @@ class LevelWindow(Gtk.Window):
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             name = dialog.nameEntry.get_text()
-            name = dialog.soundEntry.get_text()
+            sound = dialog.soundEntry.get_text()
             fp = open(levelsAddress, 'a')
             fp.write(json.dumps([name, sound, [], []]) + '\n')
             fp.close()

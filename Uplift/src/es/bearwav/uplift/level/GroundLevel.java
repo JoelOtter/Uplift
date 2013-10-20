@@ -8,27 +8,21 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.Contact;
-import com.badlogic.gdx.physics.box2d.ContactImpulse;
-import com.badlogic.gdx.physics.box2d.ContactListener;
-import com.badlogic.gdx.physics.box2d.Manifold;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 
@@ -53,7 +47,6 @@ public class GroundLevel extends Level {
 	private BoundingBox bottomBound;
 	private BoundingBox leftBound;
 	private BoundingBox rightBound;
-	public World world;
 	public Npc currentNpc;
 	public Interactable currentInteractable;
 	private boolean isCombatArea = false;
@@ -62,8 +55,6 @@ public class GroundLevel extends Level {
 	public GroundLevel(float num, float door, GameScreen s,
 			OrthographicCamera cam) {
 		super(num, door, s, cam);
-		world = new World(new Vector2(0, 0), true);
-		createContactListener();
 		try {
 			generateLevel(num, door);
 		} catch (IOException e) {
@@ -228,9 +219,6 @@ public class GroundLevel extends Level {
 	
 	public void render() {
 		cam.update();
-		Gdx.graphics.getGL20().glClearColor(0, 0, 0, 1);
-		Gdx.graphics.getGL20().glClear(
-				GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		renderer.setView(cam);
 		renderer.render(new int[] { 0, 1 });
 		spawnItemQueue();
@@ -241,7 +229,7 @@ public class GroundLevel extends Level {
 		}
 		screen.spriteBatch.end();
 		renderer.render(new int[] { 3 });
-		//debugRenderer.render(world, cam.combined);
+		debugRenderer.render(world, cam.combined);
 		fixCamera();
 		world.step(1/45f, 6, 2);
 		if (changeTo[0] != -1) change(changeTo[0], changeTo[1]);
@@ -284,35 +272,6 @@ public class GroundLevel extends Level {
 			continue;
 		}
 		screen.changeLevel(this, to, door);
-	}
-	
-	private void createContactListener(){
-		world.setContactListener(new ContactListener(){
-
-			@Override
-			public void beginContact(Contact contact) {
-				Object userdataA = contact.getFixtureA().getBody().getUserData();
-				Object userdataB = contact.getFixtureB().getBody().getUserData();
-				if (userdataA instanceof Entity) ((Entity) userdataA).collide(userdataB);
-				if (userdataB instanceof Entity) ((Entity) userdataB).collide(userdataA);
-			}
-
-			@Override
-			public void endContact(Contact contact) {
-				Object userdataA = contact.getFixtureA().getBody().getUserData();
-				Object userdataB = contact.getFixtureB().getBody().getUserData();
-				if (userdataA instanceof Entity) ((Entity) userdataA).endContact(userdataB);
-				if (userdataB instanceof Entity) ((Entity) userdataB).endContact(userdataA);
-			}
-
-			@Override
-			public void preSolve(Contact contact, Manifold oldManifold) {
-			}
-
-			@Override
-			public void postSolve(Contact contact, ContactImpulse impulse) {
-			}	
-		});
 	}
 	
 	public void spawnItemQueue(){

@@ -25,12 +25,15 @@ public abstract class Screen {
 	
 	public abstract void render();
 	
+	public abstract void resize(int width, int height);
+	
 	public void tick(Input input){
 		
 	}
 	
 	public void draw(TextureRegion tr, float x, float y, float w, float h, float rotation){
-		spriteBatch.draw(tr, x, y, 0, 0, w, h, 1, 1, rotation);
+		if (rotation == 0) spriteBatch.draw(tr, x, y, 0, 0, w, h, 1, 1, rotation);
+		else spriteBatch.draw(tr, x, y, w/2, h/2, w, h, 1, 1, rotation);
 	}
 	
 }

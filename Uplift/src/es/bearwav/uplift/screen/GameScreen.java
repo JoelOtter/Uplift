@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -20,18 +21,26 @@ import es.bearwav.uplift.entity.Interactable;
 import es.bearwav.uplift.entity.Npc;
 import es.bearwav.uplift.level.GroundLevel;
 import es.bearwav.uplift.level.Level;
+import es.bearwav.uplift.level.SpaceLevel;
 
 public class GameScreen extends Screen{
 	
 	private Level level;
 	private boolean loading;
 	private String convBuf = "000ready";
+	private String spaceText = "";
 	private GdxGame game;
 	private BitmapFont font;
 	private String currentText = "";
 	private Texture overlayTex;
 	private TextureRegion overlay;
 	private Color overlayColor;
+	private OrthographicCamera backCam;
+	private OrthographicCamera gameCam;
+	private OrthographicCamera hudCam;
+	private TextureRegion background;
+	private float zoomFactor;
+	private float prevZoomFactor;
 	
 	private static final int NUM_LINES_TEXT = 2;
 	
@@ -39,29 +48,68 @@ public class GameScreen extends Screen{
 	public void render() {
 		float h = Gdx.graphics.getHeight();
 		float w = Gdx.graphics.getWidth();
+		
 		if (!loading){
+			if (background != null){
+				int bW = background.getRegionWidth();
+				int bH = background.getRegionHeight();
+				spriteBatch.setProjectionMatrix(backCam.combined);
+				spriteBatch.begin();
+				for (int i=0; i < h; i += bH){
+					for (int j=0; j < w; j += bW){
+						draw(background, j, i, bW, bH, 0);
+					}
+				}
+				spriteBatch.end();
+			}
+			
+			//Zooming
+			if (gameCam.zoom < zoomFactor){
+				gameCam.zoom += Gdx.graphics.getDeltaTime() * zoomFactor;
+				if (gameCam.zoom > zoomFactor) gameCam.zoom = zoomFactor;
+			}
+			else if (gameCam.zoom > zoomFactor){
+				gameCam.zoom -= Gdx.graphics.getDeltaTime() * prevZoomFactor;
+				if (gameCam.zoom < zoomFactor) gameCam.zoom = zoomFactor;
+			}
+			
 			level.render();
-			spriteBatch.setProjectionMatrix(game.camera.projection);
+			spriteBatch.setProjectionMatrix(hudCam.combined);
 			spriteBatch.setColor(overlayColor);
 			spriteBatch.begin();
-			draw(overlay, -w/2, -h/2, w, h, 0);
+			draw(overlay, 0, 0, w, h, 0);
 			spriteBatch.end();
 			resetColor();
 			//Controls
 			//HUD
 			if (convBuf != "000ready"){
 				float fontH = font.getBounds("A").height * 2;
-				shapeRenderer.setProjectionMatrix(game.camera.projection);
+				shapeRenderer.setProjectionMatrix(hudCam.combined);
 				shapeRenderer.begin(ShapeType.Filled);
 				shapeRenderer.setColor(0, 0, 0, 1);
-				shapeRenderer.rect(-w/2, h/2 - (fontH * 1.1f * NUM_LINES_TEXT), w, fontH * 1.1f * NUM_LINES_TEXT);
+				shapeRenderer.rect(0, h - (fontH * 1.1f * NUM_LINES_TEXT), w, fontH * 1.1f * NUM_LINES_TEXT);
 				shapeRenderer.end();
-				spriteBatch.setProjectionMatrix(game.camera.projection);
+				spriteBatch.setProjectionMatrix(hudCam.combined);
 				spriteBatch.begin();
-				font.drawWrapped(spriteBatch, currentText, -w/2 + w/100, h/2 - h/55, w * 0.99f);
+				font.drawWrapped(spriteBatch, currentText, w/100, h - h/55, w * 0.99f);
+				spriteBatch.end();
+			}
+			if (spaceText != ""){
+				spriteBatch.begin();
+				font.drawWrapped(spriteBatch, spaceText, w/100, h - h/55, w * 0.99f);
 				spriteBatch.end();
 			}
 		}
+	}
+	
+	@Override
+	public void resize(int width, int height){
+		backCam.setToOrtho(false, width, height);
+		gameCam.setToOrtho(false, width, height);
+		hudCam.setToOrtho(false, width, height);
+		backCam.update();
+		gameCam.update();
+		hudCam.update();
 	}
 	
 	public void setColor(float r, float g, float b, float a){
@@ -90,7 +138,14 @@ public class GameScreen extends Screen{
 		loading = true;
 		this.game = game;
 		super.init(this.game);
-		level = new GroundLevel(0, 0, this, this.game.getCam());
+		
+		//Cameras
+		backCam = new OrthographicCamera();
+		gameCam = new OrthographicCamera();
+		hudCam = new OrthographicCamera();
+		resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		
+		level = new SpaceLevel(0, 0, this, gameCam);
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("game_over.ttf"));
 		font = generator.generateFont(70);
 		font.setColor(1f, 1f, 1f, 1f);
@@ -98,13 +153,15 @@ public class GameScreen extends Screen{
 		overlayTex = new Texture(Gdx.files.internal("gfx/overlay.png"));
 		overlay = new TextureRegion(overlayTex);
 		overlayColor = new Color(1, 1, 1, 1);
+		zoomFactor = 1;
 		loading = false;
 	}
 	
 	public void changeLevel(Level l, float to, float door){
 		loading = true;
 		l.remove();
-		this.level = new GroundLevel(to, door, this, game.getCam());
+		background = null;
+		this.level = new GroundLevel(to, door, this, gameCam);
 		loading = false;
 	}
 	
@@ -172,6 +229,19 @@ public class GameScreen extends Screen{
 			}
 		}
 		return null;
+	}
+	
+	public void setZoom(float factor){
+		prevZoomFactor = zoomFactor;
+		zoomFactor = factor;
+	}
+	
+	public void setBackground(TextureRegion r){
+		background = r;
+	}
+	
+	public void setSpaceText(String txt){
+		spaceText = txt;
 	}
 
 }
