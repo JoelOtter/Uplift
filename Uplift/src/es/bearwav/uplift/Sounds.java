@@ -48,7 +48,7 @@ public class Sounds {
 			}
 			music = Gdx.audio.newMusic(Gdx.files.internal("mfx/" + filename));
 			music.setLooping(true);
-			music.play();
+			//music.play();
 			currentMusic = filename;
 		}
 	}

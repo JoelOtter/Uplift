@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -41,6 +42,7 @@ public class GameScreen extends Screen{
 	private TextureRegion background;
 	private float zoomFactor;
 	private float prevZoomFactor;
+	private float fadeOutTime;
 	
 	private static final int NUM_LINES_TEXT = 2;
 	
@@ -74,6 +76,16 @@ public class GameScreen extends Screen{
 			}
 			
 			level.render();
+			if (fadeOutTime != 0){
+				Gdx.gl.glEnable(GL20.GL_BLEND);
+			    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+				shapeRenderer.setProjectionMatrix(hudCam.combined);
+				shapeRenderer.begin(ShapeType.Filled);
+				shapeRenderer.setColor(0, 0, 0, fadeOutTime);
+				shapeRenderer.rect(0, 0, w, h);
+				shapeRenderer.end();
+				Gdx.gl.glDisable(GL20.GL_BLEND);
+			}
 			spriteBatch.setProjectionMatrix(hudCam.combined);
 			spriteBatch.setColor(overlayColor);
 			spriteBatch.begin();
@@ -155,6 +167,7 @@ public class GameScreen extends Screen{
 		overlayColor = new Color(1, 1, 1, 1);
 		zoomFactor = 1;
 		loading = false;
+		fadeOutTime = 0;
 	}
 	
 	public void changeLevel(Level l, float to, float door){
@@ -162,6 +175,12 @@ public class GameScreen extends Screen{
 		l.remove();
 		background = null;
 		this.level = new GroundLevel(to, door, this, gameCam);
+		setOverlayColor(1, 1, 1, 1);
+		gameCam.zoom = 1;
+		zoomFactor = 1;
+		fadeOutTime = 0;
+		((GroundLevel) this.level).fixCamera();
+		Gdx.graphics.getGL20().glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		loading = false;
 	}
 	
@@ -242,6 +261,10 @@ public class GameScreen extends Screen{
 	
 	public void setSpaceText(String txt){
 		spaceText = txt;
+	}
+	
+	public void fadeOut(float time, float length){
+		fadeOutTime = time/length;
 	}
 
 }

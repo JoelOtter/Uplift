@@ -15,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 
+import es.bearwav.uplift.Input;
 import es.bearwav.uplift.entity.Entity;
 import es.bearwav.uplift.entity.Planet;
 import es.bearwav.uplift.entity.Ship;
@@ -27,6 +28,9 @@ public class SpaceLevel extends Level{
 	private Texture backgTex;
 	private Ship ship;
 	private Star star;
+	public Planet currentPlanet;
+	private boolean warping = false;
+	private float warptime;
 
 	public SpaceLevel(float num, float door, GameScreen s,
 			OrthographicCamera cam) {
@@ -39,6 +43,7 @@ public class SpaceLevel extends Level{
 		debugRenderer = new Box2DDebugRenderer();
 		backgTex = new Texture(Gdx.files.internal("gfx/startile.png"));
 		s.setBackground(new TextureRegion(backgTex));
+		warptime = 0;
 	}
 
 	@Override
@@ -86,12 +91,28 @@ public class SpaceLevel extends Level{
 		debugRenderer.render(world, cam.combined);
 		fixCamera();
 		world.step(1/45f, 6, 2);
+		//warp/land stuff
+		if (warping){
+			warptime += Gdx.graphics.getDeltaTime();
+			if (warptime > 1){
+				currentPlanet.land();
+			}
+			else screen.fadeOut(warptime, 1);
+		}
+	}
+	
+	@Override
+	public void tick(Input input){
+		if (!warping) super.tick(input);
 	}
 
 	@Override
 	public void remove() {
-		// TODO Auto-generated method stub
-		
+		world.dispose();
+		debugRenderer.dispose();
+		for (Entity e : entities) {
+			e.remove();
+		}
 	}
 
 	@Override
@@ -102,8 +123,12 @@ public class SpaceLevel extends Level{
 
 	@Override
 	public void processButtonPress() {
-		// TODO Auto-generated method stub
-		
+		if (currentPlanet != null){
+			ship.stop();
+			screen.setZoom(0.1f);
+			screen.setSpaceText("");
+			warping = true;
+		}
 	}
 	
 	public void fixCamera() {

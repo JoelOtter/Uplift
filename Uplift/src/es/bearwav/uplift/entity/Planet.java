@@ -6,11 +6,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Array;
 
 import es.bearwav.uplift.level.Level;
+import es.bearwav.uplift.level.SpaceLevel;
 import es.bearwav.uplift.screen.GameScreen;
 
 public class Planet extends Entity{
@@ -62,6 +63,7 @@ public class Planet extends Entity{
 		if (collider instanceof Ship){
 			l.screen.setZoom(0.7f);
 			l.screen.setSpaceText(desc);
+			((SpaceLevel) l).currentPlanet = this;
 		}
 	}
 
@@ -70,7 +72,12 @@ public class Planet extends Entity{
 		if (collider instanceof Ship){
 			l.screen.setZoom(1);
 			l.screen.setSpaceText("");
+			((SpaceLevel) l).currentPlanet = null;
 		}
+	}
+	
+	public void land(){
+		l.screen.changeLevel(l, level, 0);
 	}
 	
 }

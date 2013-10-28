@@ -92,6 +92,12 @@ public class Ship extends Entity{
 			velocity.x = MAX_SPEED;
 		body.setLinearVelocity(velocity);
 	}
+	
+	public void stop(){
+		velocity.x = 0;
+		velocity.y = 0;
+		body.setLinearVelocity(velocity);
+	}
 
 	@Override
 	public void remove() {

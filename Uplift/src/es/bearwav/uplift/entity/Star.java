@@ -120,7 +120,6 @@ public class Star extends Entity {
 		while (iter.hasNext()){
 			iter.next().render(s, c);
 		}
-		System.out.println(particles.size);
 	}
 	
 	public void removeParticle(StarParticle p){
