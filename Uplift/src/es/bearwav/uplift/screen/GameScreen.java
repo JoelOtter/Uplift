@@ -22,7 +22,6 @@ import es.bearwav.uplift.entity.Interactable;
 import es.bearwav.uplift.entity.Npc;
 import es.bearwav.uplift.level.GroundLevel;
 import es.bearwav.uplift.level.Level;
-import es.bearwav.uplift.level.SpaceLevel;
 
 public class GameScreen extends Screen{
 	
@@ -43,6 +42,7 @@ public class GameScreen extends Screen{
 	private float zoomFactor;
 	private float prevZoomFactor;
 	private float fadeOutTime;
+	private Health health;
 	
 	private static final int NUM_LINES_TEXT = 2;
 	
@@ -94,6 +94,11 @@ public class GameScreen extends Screen{
 			resetColor();
 			//Controls
 			//HUD
+			if (level instanceof GroundLevel){
+				spriteBatch.begin();
+				health.render();
+				spriteBatch.end();
+			}
 			if (convBuf != "000ready"){
 				float fontH = font.getBounds("A").height * 2;
 				shapeRenderer.setProjectionMatrix(hudCam.combined);
@@ -144,6 +149,7 @@ public class GameScreen extends Screen{
 	public void remove(){
 		super.remove();
 		level.remove();
+		health.remove();
 	}
 	
 	public void init(GdxGame game){
@@ -157,7 +163,8 @@ public class GameScreen extends Screen{
 		hudCam = new OrthographicCamera();
 		resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		
-		level = new SpaceLevel(0, 0, this, gameCam);
+		level = new GroundLevel(0, 0, this, gameCam);
+		health = new Health(this, getStats());
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("game_over.ttf"));
 		font = generator.generateFont(70);
 		font.setColor(1f, 1f, 1f, 1f);
