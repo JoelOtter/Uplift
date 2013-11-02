@@ -88,27 +88,30 @@ public class Lightning extends Entity{
 		this.direction = dir;
 		switch (direction){
 		case 0:
-			this.x = x + (playerWidth * 1.3f);
+			this.x = x + (playerWidth * 0.2f);
 			this.y = y + (playerHeight * 0.75f);
 			rotation = 90;
+			body.setTransform(new Vector2(this.x + w, this.y), (float) Math.toRadians(rotation));
 			break;
 		case 1:
 			this.x = x + (playerWidth * 0.81f);
 			this.y = y + (playerHeight * 0.17f);
 			rotation = 0;
+			body.setTransform(new Vector2(this.x, this.y), (float) Math.toRadians(rotation));
 			break;
 		case 2:
-			this.x = x - (playerWidth * 0.35f);
-			this.y = y + (playerHeight * 0.5f);
+			this.x = x - (playerWidth * 0.41f);
+			this.y = y - (playerHeight * 0.17f);
 			rotation = -90;
+			body.setTransform(new Vector2(this.x, this.y + h), (float) Math.toRadians(rotation));
 			break;
 		case 3:
-			this.x = x + (playerWidth * 0.07f);
-			this.y = y + (playerHeight * 0.9f);
+			this.x = x - (playerWidth * 1.05f);
+			this.y = y + (playerHeight * 0.28f);
 			rotation = 180;
+			body.setTransform(new Vector2(this.x + w, this.y + h), (float) Math.toRadians(rotation));
 			break;
 		}
-		body.setTransform(new Vector2(this.x, this.y), (float) Math.toRadians(rotation));
 	}
 
 	@Override

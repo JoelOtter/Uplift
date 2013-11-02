@@ -31,6 +31,7 @@ public class GameScreen extends Screen{
 	private String spaceText = "";
 	private GdxGame game;
 	private BitmapFont font;
+	protected BitmapFont hudFont;
 	private String currentText = "";
 	private Texture overlayTex;
 	private TextureRegion overlay;
@@ -43,6 +44,8 @@ public class GameScreen extends Screen{
 	private float prevZoomFactor;
 	private float fadeOutTime;
 	private Health health;
+	protected Texture itemsTex;
+	private Money money;
 	
 	private static final int NUM_LINES_TEXT = 2;
 	
@@ -97,6 +100,7 @@ public class GameScreen extends Screen{
 			if (level instanceof GroundLevel){
 				spriteBatch.begin();
 				health.render();
+				money.render();
 				spriteBatch.end();
 			}
 			if (convBuf != "000ready"){
@@ -165,9 +169,12 @@ public class GameScreen extends Screen{
 		
 		level = new GroundLevel(0, 0, this, gameCam);
 		health = new Health(this, getStats());
+		money = new Money(this, getStats());
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("game_over.ttf"));
 		font = generator.generateFont(70);
 		font.setColor(1f, 1f, 1f, 1f);
+		hudFont = generator.generateFont(50);
+		hudFont.setColor(1f, 1f, 1f, 1f);
 		generator.dispose();
 		overlayTex = new Texture(Gdx.files.internal("gfx/overlay.png"));
 		overlay = new TextureRegion(overlayTex);
