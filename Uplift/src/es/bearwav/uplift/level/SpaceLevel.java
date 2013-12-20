@@ -89,8 +89,10 @@ public class SpaceLevel extends Level{
 		}
 		screen.spriteBatch.end();
 		debugRenderer.render(world, cam.combined);
-		fixCamera();
-		world.step(1/45f, 6, 2);
+		if (!paused) {
+			fixCamera();
+			world.step(1 / 45f, 6, 2);
+		}
 		//warp/land stuff
 		if (warping){
 			warptime += Gdx.graphics.getDeltaTime();

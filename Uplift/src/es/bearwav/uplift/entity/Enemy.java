@@ -102,20 +102,23 @@ public class Enemy extends Entity {
 
 	@Override
 	public void render(GameScreen screen, Camera cam) {
-		if (alive) {
-			float time = Gdx.graphics.getDeltaTime();
-			stateTime += time;
-			if (takingDamage) {
-				damageTime += time;
-				screen.setColor(1, 0, 0, 1);
+		if (!screen.level.paused) {
+			if (alive) {
+				float time = Gdx.graphics.getDeltaTime();
+				stateTime += time;
+				if (takingDamage) {
+					damageTime += time;
+					screen.setColor(1, 0, 0, 1);
+				} else
+					directionTime += time;
 			}
-			else
-				directionTime += time;
 		}
 		screen.draw(currentFrame, x, y, w * enemyScale, h * enemyScale, 0);
-		screen.resetColor();
-		x = body.getPosition().x - (w * enemyScale) / 2;
-		y = body.getPosition().y - (h * enemyScale) / 2;
+		if (!screen.level.paused) {
+			screen.resetColor();
+			x = body.getPosition().x - (w * enemyScale) / 2;
+			y = body.getPosition().y - (h * enemyScale) / 2;
+		}
 	}
 
 	public void tick(Input input) {

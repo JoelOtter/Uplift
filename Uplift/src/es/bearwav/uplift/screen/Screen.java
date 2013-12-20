@@ -35,5 +35,9 @@ public abstract class Screen {
 		if (rotation == 0) spriteBatch.draw(tr, x, y, 0, 0, w, h, 1, 1, rotation);
 		else spriteBatch.draw(tr, x, y, w/2, h/2, w, h, 1, 1, rotation);
 	}
+
+	public void init(GdxGame game, GameScreen g) {
+		init(game);
+	}
 	
 }

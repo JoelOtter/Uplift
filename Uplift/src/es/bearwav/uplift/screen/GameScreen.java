@@ -25,7 +25,7 @@ import es.bearwav.uplift.level.Level;
 
 public class GameScreen extends Screen{
 	
-	private Level level;
+	public Level level;
 	private boolean loading;
 	private String convBuf = "000ready";
 	private String spaceText = "";
@@ -46,6 +46,8 @@ public class GameScreen extends Screen{
 	private Health health;
 	protected Texture itemsTex;
 	private Money money;
+	private MenuScreen menu;
+	private boolean menuUp;
 	
 	private static final int NUM_LINES_TEXT = 2;
 	
@@ -121,6 +123,7 @@ public class GameScreen extends Screen{
 				spriteBatch.end();
 			}
 		}
+		if (menuUp) menu.render();
 	}
 	
 	@Override
@@ -131,6 +134,8 @@ public class GameScreen extends Screen{
 		backCam.update();
 		gameCam.update();
 		hudCam.update();
+		menu.resize(width, height);
+		level.fixCamera();
 	}
 	
 	public void setColor(float r, float g, float b, float a){
@@ -147,7 +152,14 @@ public class GameScreen extends Screen{
 	
 	@Override
 	public void tick(Input input){
-		if (!loading) level.tick(input);
+		if (!loading) {
+			level.tick(input);
+			if (input.keys[input.esc]){
+				menu.activate();
+				menuUp = true;
+				level.paused = true;
+			}
+		}
 	}
 	
 	public void remove(){
@@ -160,12 +172,14 @@ public class GameScreen extends Screen{
 		loading = true;
 		this.game = game;
 		super.init(this.game);
+		Gdx.input.setInputProcessor(getInput());
 		
 		//Cameras
 		backCam = new OrthographicCamera();
 		gameCam = new OrthographicCamera();
 		hudCam = new OrthographicCamera();
-		resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		menu = new MenuScreen();
+		menu.init(game, this);
 		
 		level = new GroundLevel(0, 0, this, gameCam);
 		health = new Health(this, getStats());
@@ -180,8 +194,9 @@ public class GameScreen extends Screen{
 		overlay = new TextureRegion(overlayTex);
 		overlayColor = new Color(1, 1, 1, 1);
 		zoomFactor = 1;
-		loading = false;
 		fadeOutTime = 0;
+		resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		loading = false;
 	}
 	
 	public void changeLevel(Level l, float to, float door){
@@ -279,6 +294,13 @@ public class GameScreen extends Screen{
 	
 	public void fadeOut(float time, float length){
 		fadeOutTime = time/length;
+	}
+	
+	public void deactivateMenu(){
+		menuUp = false;
+		level.paused = false;
+		getInput().reset();
+		Gdx.input.setInputProcessor(getInput());
 	}
 
 }

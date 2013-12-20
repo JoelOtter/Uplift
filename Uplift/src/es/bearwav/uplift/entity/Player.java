@@ -108,23 +108,28 @@ public class Player extends Entity {
 
 	@Override
 	public void render(GameScreen screen, Camera cam) {
-		float time = Gdx.graphics.getDeltaTime();
-		stateTime += time;
-		if (takingDamage){
-			damageTime += time;
-			screen.setColor(1, 0, 0, 1);
+		if (!screen.level.paused) {
+			float time = Gdx.graphics.getDeltaTime();
+			stateTime += time;
+			if (takingDamage) {
+				damageTime += time;
+				screen.setColor(1, 0, 0, 1);
+			}
+			if (isAttacking)
+				attackTime += time;
 		}
-		if (isAttacking) attackTime += time;
 		if (direction == 0) {
 			lightning.render(screen, cam);
 		}
 		screen.draw(currentFrame, x, y, w * playerScale, h * playerScale, 0);
-		screen.resetColor();
+		if (!screen.level.paused) screen.resetColor();
 		if (direction != 0){
 			lightning.render(screen, cam);
 		}
-		x = body.getPosition().x - (w * playerScale)/2;
-		y = body.getPosition().y - (h * playerScale * boundHeight)/2;
+		if (!screen.level.paused) {
+			x = body.getPosition().x - (w * playerScale) / 2;
+			y = body.getPosition().y - (h * playerScale * boundHeight) / 2;
+		}
 	}
 
 	public void remove() {

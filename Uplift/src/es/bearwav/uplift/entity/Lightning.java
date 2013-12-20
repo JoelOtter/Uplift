@@ -62,8 +62,10 @@ public class Lightning extends Entity{
 	@Override
 	public void render(GameScreen screen, Camera cam) {
 		if (active) {
-			stateTime += Gdx.graphics.getDeltaTime();
-			currentFrame = animation.getKeyFrame(stateTime);
+			if (!screen.level.paused) {
+				stateTime += Gdx.graphics.getDeltaTime();
+				currentFrame = animation.getKeyFrame(stateTime);
+			}
 			screen.draw(currentFrame, x, y, w, h, rotation);
 		}
 		if (stateTime > ATTACK_LENGTH){

@@ -12,10 +12,15 @@ public class Input implements InputProcessor{
 	public int down = 2;
 	public int left = 3;
 	public int space = 4;
+	public int esc = 5;
 	private boolean dirDisabled = false;
 	
 	public Input(){
-		keys = new boolean[5];
+		keys = new boolean[6];
+		reset();
+	}
+	
+	public void reset(){
 		for (int i = 0; i < keys.length; i++){
 			keys[i] = false;
 		}
@@ -23,12 +28,13 @@ public class Input implements InputProcessor{
 	
 	public void set(int key, boolean to){
 		if (!dirDisabled){
-			if (key == Keys.LEFT) {keys[left] = to;}
-			if (key == Keys.DOWN) {keys[down] = to;}
-			if (key == Keys.RIGHT) {keys[right] = to;}
-			if (key == Keys.UP) {keys[up] = to;}
+			if (key == Keys.LEFT) keys[left] = to;
+			if (key == Keys.DOWN) keys[down] = to;
+			if (key == Keys.RIGHT) keys[right] = to;
+			if (key == Keys.UP) keys[up] = to;
+			if (key == Keys.ESCAPE) keys[esc] = to;
 		}
-		if (key == Keys.SPACE) {keys[space] = to;}
+		if (key == Keys.SPACE) keys[space] = to;
 	}
 
 	@Override

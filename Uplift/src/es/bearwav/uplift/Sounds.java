@@ -18,7 +18,7 @@ public class Sounds {
 	}
 	
 	public void remove(){
-		music.dispose();
+		if (music != null) music.dispose();
 		Iterator<Sound> sfxIter = sfx.values().iterator();
 		while (sfxIter.hasNext()){
 			sfxIter.next().dispose();
@@ -40,7 +40,6 @@ public class Sounds {
 	}
 	
 	public void setMusic(String filename){
-		System.out.println("Hello");
 		if (!currentMusic.equals(filename)) {
 			if (music != null) {
 				music.stop();

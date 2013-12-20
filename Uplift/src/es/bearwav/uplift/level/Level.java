@@ -25,6 +25,7 @@ public abstract class Level {
 	public float[] changeTo = {-1, -1};
 	protected boolean buttonDown;
 	public World world;
+	public boolean paused;
 
 	public Level(float num, float door, GameScreen s, OrthographicCamera cam) {
 		this.cam = cam;
@@ -90,6 +91,8 @@ public abstract class Level {
 	public abstract void change(float to, float door);
 	
 	public abstract void processButtonPress();
+	
+	public void fixCamera() {};
 	
 	public Stats getStats(){ return screen.getStats(); }
 	public Input getInput(){ return screen.getInput(); }

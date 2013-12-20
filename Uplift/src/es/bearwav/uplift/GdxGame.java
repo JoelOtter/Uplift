@@ -20,7 +20,6 @@ public class GdxGame implements ApplicationListener {
 		input = new Input();
 		sounds = new Sounds();
 		setScreen(new GameScreen());
-		Gdx.input.setInputProcessor(input);
 		Gdx.graphics.setVSync(true);
 	}
 

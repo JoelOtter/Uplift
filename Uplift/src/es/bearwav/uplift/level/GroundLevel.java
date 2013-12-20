@@ -230,8 +230,10 @@ public class GroundLevel extends Level {
 		screen.spriteBatch.end();
 		renderer.render(new int[] { 3 });
 		debugRenderer.render(world, cam.combined);
-		fixCamera();
-		world.step(1/45f, 6, 2);
+		if (!paused) {
+			fixCamera();
+			world.step(1 / 45f, 6, 2);
+		}
 		if (changeTo[0] != -1) change(changeTo[0], changeTo[1]);
 	}
 	

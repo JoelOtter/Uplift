@@ -72,12 +72,14 @@ public class Npc extends Entity{
 
 	@Override
 	public void render(GameScreen screen, Camera cam) {
-		if (!talking && (anim>0)) {
-			stateTime += Gdx.graphics.getDeltaTime();
-		}
-		if (stateTime > speed){
-			stateTime = 0;
-			currentFrame = chooseDirection(rand.nextInt(4));
+		if (!screen.level.paused) {
+			if (!talking && (anim > 0)) {
+				stateTime += Gdx.graphics.getDeltaTime();
+			}
+			if (stateTime > speed) {
+				stateTime = 0;
+				currentFrame = chooseDirection(rand.nextInt(4));
+			}
 		}
 		screen.draw(currentFrame, x, y, w * npcScale, h * npcScale, 0);
 	}
