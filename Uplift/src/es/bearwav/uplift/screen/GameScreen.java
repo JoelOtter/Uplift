@@ -22,6 +22,7 @@ import es.bearwav.uplift.entity.Interactable;
 import es.bearwav.uplift.entity.Npc;
 import es.bearwav.uplift.level.GroundLevel;
 import es.bearwav.uplift.level.Level;
+import es.bearwav.uplift.level.SpaceLevel;
 
 public class GameScreen extends Screen{
 	
@@ -181,7 +182,7 @@ public class GameScreen extends Screen{
 		menu = new MenuScreen();
 		menu.init(game, this);
 		
-		level = new GroundLevel(0, 0, this, gameCam);
+		level = new SpaceLevel(0, 0, this, gameCam);
 		health = new Health(this, getStats());
 		money = new Money(this, getStats());
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("game_over.ttf"));

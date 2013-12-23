@@ -87,8 +87,5 @@ public class Input implements InputProcessor{
 	
 	public void setDirectionsDisabled(boolean dis){
 		dirDisabled = dis;
-		for (int i=0; i < 4; i++){
-			keys[i] = false;
-		}
 	}
 }

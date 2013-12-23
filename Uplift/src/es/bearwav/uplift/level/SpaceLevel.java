@@ -44,6 +44,7 @@ public class SpaceLevel extends Level{
 		backgTex = new Texture(Gdx.files.internal("gfx/startile.png"));
 		s.setBackground(new TextureRegion(backgTex));
 		warptime = 0;
+		s.getInput().setDirectionsDisabled(false);
 	}
 
 	@Override
@@ -97,6 +98,7 @@ public class SpaceLevel extends Level{
 		if (warping){
 			warptime += Gdx.graphics.getDeltaTime();
 			if (warptime > 1){
+				screen.getInput().setDirectionsDisabled(false);
 				currentPlanet.land();
 			}
 			else screen.fadeOut(warptime, 1);
@@ -129,6 +131,8 @@ public class SpaceLevel extends Level{
 			ship.stop();
 			screen.setZoom(0.1f);
 			screen.setSpaceText("");
+			screen.getInput().setDirectionsDisabled(true);
+			screen.getInput().reset();
 			warping = true;
 		}
 	}

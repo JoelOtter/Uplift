@@ -4,7 +4,7 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 
-import es.bearwav.uplift.screen.GameScreen;
+import es.bearwav.uplift.screen.JournalScreen;
 import es.bearwav.uplift.screen.Screen;
 
 public class GdxGame implements ApplicationListener {
@@ -16,10 +16,10 @@ public class GdxGame implements ApplicationListener {
 
 	@Override
 	public void create() {
-		stats = new Stats(100, 0, 0);
+		stats = new Stats(100, 0);
 		input = new Input();
 		sounds = new Sounds();
-		setScreen(new GameScreen());
+		setScreen(new JournalScreen());
 		Gdx.graphics.setVSync(true);
 	}
 

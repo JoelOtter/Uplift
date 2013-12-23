@@ -1,14 +1,17 @@
 package es.bearwav.uplift;
 
+import java.util.HashMap;
+
 public class Stats {
 	private int health;
 	private int money;
-	private int mainquest;
+	private HashMap<String, Integer> quests;
 	
-	public Stats(int health, int money, int mainquest){
+	public Stats(int health, int money){
 		this.health = health;
 		this.money = money;
-		this.mainquest = mainquest;
+		this.quests = new HashMap<String, Integer>();
+		this.quests.put("MAIN", 0);
 	}
 	
 	public int incHealth(int inc){
@@ -48,11 +51,10 @@ public class Stats {
 	public int getHealth() { return health; }
 	
 	public int getQuest(String name) {
-		if (name == "MAIN") return mainquest;
-		else return 0;
+		return this.quests.get(name);
 	}
 	
 	public void incQuest(String name){
-		if (name == "MAIN") mainquest++;
+		this.quests.put(name, this.quests.get(name) + 1);
 	}
 }
