@@ -1,1 +1,2 @@
-["MAIN", "Main Quest", [[2, "two"]]]
+["MAIN", "Main Quest", [[0, "zero"], [1, "one. hello. my name is joel and this is a test, of sorts, I suppose. Testing for width stuff."], [2, "two. hi"], [3, "three. uh oh."]]]
+["SECOND", "Second Quest", [[2, "two"]]]

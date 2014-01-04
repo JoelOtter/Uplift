@@ -33,6 +33,7 @@ public class GameScreen extends Screen{
 	private GdxGame game;
 	private BitmapFont font;
 	protected BitmapFont hudFont;
+	private BitmapFont nameFont;
 	private String currentText = "";
 	private Texture overlayTex;
 	private TextureRegion overlay;
@@ -49,6 +50,8 @@ public class GameScreen extends Screen{
 	private Money money;
 	private MenuScreen menu;
 	private boolean menuUp;
+	public String levelName;
+	private Texture menuItemTex;
 	
 	private static final int NUM_LINES_TEXT = 2;
 	
@@ -106,6 +109,25 @@ public class GameScreen extends Screen{
 				money.render();
 				spriteBatch.end();
 			}
+			if (!levelName.equals("") && convBuf.equals("000ready")){ //Area name
+				float recW = w/4;
+				float recH = h/10;
+				float recX = w/60;
+				float recY = h * 0.8f;
+				float fontW = nameFont.getBounds(levelName).width;
+				float fontH = nameFont.getBounds(levelName).height;
+				shapeRenderer.setProjectionMatrix(hudCam.combined);
+				shapeRenderer.begin(ShapeType.Filled);
+				shapeRenderer.setColor(1, 1, 1, 1);
+				shapeRenderer.rect(recX, recY, recW, recH);
+				shapeRenderer.setColor(0, 0, 0, 1);
+				shapeRenderer.rect(recX + recH * 0.05f, recY + recH * 0.05f, recW - recH * 0.1f, recH * 0.9f);
+				shapeRenderer.end();
+				spriteBatch.setProjectionMatrix(hudCam.combined);
+				spriteBatch.begin();
+				nameFont.draw(spriteBatch, levelName, recX + recW/2 - fontW/2, recY + recH/2 + fontH/2);
+				spriteBatch.end();
+			}
 			if (convBuf != "000ready"){
 				float fontH = font.getBounds("A").height * 2;
 				shapeRenderer.setProjectionMatrix(hudCam.combined);
@@ -129,6 +151,8 @@ public class GameScreen extends Screen{
 	
 	@Override
 	public void resize(int width, int height){
+		w = width;
+		h = height;
 		backCam.setToOrtho(false, width, height);
 		gameCam.setToOrtho(false, width, height);
 		hudCam.setToOrtho(false, width, height);
@@ -167,6 +191,12 @@ public class GameScreen extends Screen{
 		super.remove();
 		level.remove();
 		health.remove();
+		overlayTex.dispose();
+		itemsTex.dispose();
+		menuItemTex.dispose();
+		font.dispose();
+		hudFont.dispose();
+		nameFont.dispose();
 	}
 	
 	public void init(GdxGame game){
@@ -180,7 +210,8 @@ public class GameScreen extends Screen{
 		gameCam = new OrthographicCamera();
 		hudCam = new OrthographicCamera();
 		menu = new MenuScreen();
-		menu.init(game, this);
+		menuItemTex = new Texture(Gdx.files.internal("gfx/menu_icons.png"));
+		menu.init(game, this, TextureRegion.split(menuItemTex, menuItemTex.getWidth()/2, menuItemTex.getHeight()/3));
 		
 		level = new SpaceLevel(0, 0, this, gameCam);
 		health = new Health(this, getStats());
@@ -190,6 +221,8 @@ public class GameScreen extends Screen{
 		font.setColor(1f, 1f, 1f, 1f);
 		hudFont = generator.generateFont(50);
 		hudFont.setColor(1f, 1f, 1f, 1f);
+		nameFont = generator.generateFont(60);
+		nameFont.setColor(1, 1, 1, 1);
 		generator.dispose();
 		overlayTex = new Texture(Gdx.files.internal("gfx/overlay.png"));
 		overlay = new TextureRegion(overlayTex);
@@ -198,6 +231,7 @@ public class GameScreen extends Screen{
 		fadeOutTime = 0;
 		resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		loading = false;
+		levelName = "";
 	}
 	
 	public void changeLevel(Level l, float to, float door){

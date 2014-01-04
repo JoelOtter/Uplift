@@ -11,7 +11,8 @@ public class Stats {
 		this.health = health;
 		this.money = money;
 		this.quests = new HashMap<String, Integer>();
-		this.quests.put("MAIN", 0);
+		this.quests.put("MAIN", 2);
+		this.quests.put("SECOND", 2);
 	}
 	
 	public int incHealth(int inc){
@@ -51,7 +52,9 @@ public class Stats {
 	public int getHealth() { return health; }
 	
 	public int getQuest(String name) {
-		return this.quests.get(name);
+		if (this.quests.containsKey(name)) return this.quests.get(name);
+		else return -1;
+		
 	}
 	
 	public void incQuest(String name){

@@ -89,7 +89,7 @@ public class SpaceLevel extends Level{
 			e.render(screen, cam);
 		}
 		screen.spriteBatch.end();
-		debugRenderer.render(world, cam.combined);
+		//debugRenderer.render(world, cam.combined);
 		if (!paused) {
 			fixCamera();
 			world.step(1 / 45f, 6, 2);

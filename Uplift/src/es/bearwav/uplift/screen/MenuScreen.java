@@ -5,11 +5,14 @@ import java.util.ArrayList;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.Window.WindowStyle;
 
 import es.bearwav.menu.MainMenuButton;
 import es.bearwav.uplift.GdxGame;
@@ -23,8 +26,7 @@ public class MenuScreen extends Screen{
 	public BitmapFont font;
 	private GameScreen s;
 	
-	@Override
-	public void init(GdxGame game, GameScreen g){
+	public void init(GdxGame game, GameScreen g, TextureRegion[][] icons){
 		super.init(game);
 		s = g;
 		w = Gdx.graphics.getWidth();
@@ -36,12 +38,12 @@ public class MenuScreen extends Screen{
 		
 		buttons = new ArrayList<MainMenuButton>();
 		stage = new Stage();
-		buttons.add(new MainMenuButton(w, h, "Journal", this));
-		buttons.add(new MainMenuButton(w, h, "Items", this));
-		buttons.add(new MainMenuButton(w, h, "Spells", this));
-		buttons.add(new MainMenuButton(w, h, "Save", this));
-		buttons.add(new MainMenuButton(w, h, "Help", this));
-		buttons.add(new MainMenuButton(w, h, "Quit", this));
+		buttons.add(new MainMenuButton(w, h, "Journal", this, icons[0][1]));
+		buttons.add(new MainMenuButton(w, h, "Items", this, icons[2][0]));
+		buttons.add(new MainMenuButton(w, h, "Spells", this, icons[2][1]));
+		buttons.add(new MainMenuButton(w, h, "Save", this, icons[0][0]));
+		buttons.add(new MainMenuButton(w, h, "Help", this, icons[1][1]));
+		buttons.add(new MainMenuButton(w, h, "Quit", this, icons[1][0]));
 		for (Actor a : buttons){
 			stage.addActor(a);
 		}

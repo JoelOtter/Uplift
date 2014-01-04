@@ -8,8 +8,8 @@ public class Main {
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "Uplift";
 		cfg.useGL20 = true;
-		cfg.width = 800;
-		cfg.height = 480;
+		cfg.width = 1280;
+		cfg.height = 720;
 		
 		new LwjglApplication(new GdxGame(), cfg);
 	}

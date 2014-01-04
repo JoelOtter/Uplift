@@ -51,6 +51,8 @@ public class GroundLevel extends Level {
 	public Interactable currentInteractable;
 	private boolean isCombatArea = false;
 	private Box2DDebugRenderer debugRenderer;
+	private String name;
+	private float timePassed;
 
 	public GroundLevel(float num, float door, GameScreen s,
 			OrthographicCamera cam) {
@@ -62,6 +64,7 @@ public class GroundLevel extends Level {
 		}
 		itemQueue = new ArrayList<Item>();
 		debugRenderer = new Box2DDebugRenderer();
+		timePassed = 0;
 	}
 	
 	protected void generateLevel(float num, float door) throws IOException {
@@ -77,12 +80,13 @@ public class GroundLevel extends Level {
 		Json js = new Json();
 		ArrayList<?> levelData = js.fromJson(ArrayList.class, levelLine);
 		String tiles = "tmx/" + (String) levelData.get(0) + ".tmx";
-		String music = (String) levelData.get(1);
+		name = (String) levelData.get(1);
+		String music = (String) levelData.get(2);
 		screen.getSounds().setMusic(music);
-		Array<?> doors = (Array<?>) levelData.get(2);
-		Array<?> npcs = (Array<?>) levelData.get(3);
-		Array<?> enemies = (Array<?>) levelData.get(4);
-		Array<?> interactables = (Array<?>) levelData.get(5);
+		Array<?> doors = (Array<?>) levelData.get(3);
+		Array<?> npcs = (Array<?>) levelData.get(4);
+		Array<?> enemies = (Array<?>) levelData.get(5);
+		Array<?> interactables = (Array<?>) levelData.get(6);
 		buildTiles(tiles);
 
 		// Set up doors
@@ -218,6 +222,7 @@ public class GroundLevel extends Level {
 	}
 	
 	public void render() {
+		timePassed += Gdx.graphics.getDeltaTime();
 		cam.update();
 		renderer.setView(cam);
 		renderer.render(new int[] { 0, 1 });
@@ -230,6 +235,8 @@ public class GroundLevel extends Level {
 		screen.spriteBatch.end();
 		renderer.render(new int[] { 3 });
 		debugRenderer.render(world, cam.combined);
+		if (timePassed < 3) screen.levelName = name;
+		else screen.levelName = "";
 		if (!paused) {
 			fixCamera();
 			world.step(1 / 45f, 6, 2);

@@ -1,7 +1,10 @@
 package es.bearwav.menu;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -19,39 +22,48 @@ public class MainMenuButton extends Actor {
 	private float h;
 	private String text;
 	private MenuScreen s;
-	private ShapeType type = ShapeType.Line;
-	private Color c;
+	private Color txtC;
+	private Color recC;
+	private TextureRegion t;
 
-	public MainMenuButton(int sW, int sH, String text, MenuScreen s) {
+	public MainMenuButton(int sW, int sH, final String text, MenuScreen s, TextureRegion tr) {
 		this.text = text;
 		this.s = s;
-		c = new Color(1, 1, 1, 1);
+		this.t = tr;
+		txtC = new Color(1, 1, 1, 1);
+		recC = new Color(0, 0, 0, 0.7f);
 		resize(sW, sH);
 		this.addListener(new InputListener() {
 			public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 				System.out.println(MainMenuButton.this.text);
-				type = ShapeType.Filled;
-				c.set(0, 0, 0, 1);
+				txtC.set(0, 0, 0, 1);
+				recC.set(1, 1, 1, 0.6f);
 				return true;
 			}
 			public void touchUp(InputEvent event, float x, float y, int pointer, int button){
-				type = ShapeType.Line;
-				c.set(1, 1, 1, 1);
+				txtC.set(1, 1, 1, 1);
+				recC.set(0, 0, 0, 0.7f);
+				callEvent(text);
 			}
 		});
 	}
 
 	public void draw(SpriteBatch batch, float parentAlpha) {
 		batch.end();
+		Gdx.gl.glEnable(GL20.GL_BLEND);
+	    Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 		rend.setProjectionMatrix(batch.getProjectionMatrix());
 		rend.setTransformMatrix(batch.getTransformMatrix());
 		rend.translate(getX(), getY(), 0);
-		rend.setColor(1, 1, 1, 1);
-		rend.begin(type);
+		rend.setColor(recC);
+		rend.begin(ShapeType.Filled);
 		rend.rect(0, 0, getWidth(), getHeight());
 		rend.end();
+		Gdx.gl.glDisable(GL20.GL_BLEND);
 		batch.begin();
-		s.font.setColor(c);
+		float size = h/3 * 2;
+		batch.draw(t, x + w/2 - size/2, y + h/2 - size/3, size, size);
+		s.font.setColor(txtC);
 		s.font.setScale(h/120);
 		//float fheight = s.font.getBounds(text).height;
 		float fwidth = s.font.getBounds(text).width;
@@ -69,6 +81,11 @@ public class MainMenuButton extends Actor {
 		rend = new ShapeRenderer();
 		this.setPosition(x, y);
 		this.setSize(w, h);
+	}
+	
+	private void callEvent(String s) {
+		if (s.equals("Journal")) this.s.game.showJournal();
+		if (s.equals("Quit")) Gdx.app.exit();
 	}
 
 }

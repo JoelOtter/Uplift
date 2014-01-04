@@ -14,15 +14,21 @@ class NewLevelDialog(Gtk.Dialog):
         box = self.get_content_area()
         nameBox = Gtk.Box(spacing=2)
         nameLabel = Gtk.Label("Tileset")
+        titleBox = Gtk.Box(spacing=2)
+        titleLabel = Gtk.Label("Name")
         self.nameEntry = Gtk.Entry()
+        self.titleEntry = Gtk.Entry()
         soundBox = Gtk.Box(spacing=2)
         soundLabel = Gtk.Label("Music")
         self.soundEntry = Gtk.Entry()
         nameBox.pack_start(nameLabel, False, False, 2)
-        nameBox.pack_start(self.soundEntry, True, True, 2)
+        nameBox.pack_start(self.nameEntry, True, True, 2)
+        titleBox.pack_start(titleLabel, False, False, 2)
+        titleBox.pack_start(self.titleEntry, True, True, 2)
         soundBox.pack_start(soundLabel, False, False, 2)
         soundBox.pack_start(self.soundEntry, True, True, 2)
         box.pack_start(nameBox, False, False, 0)
+        box.pack_start(titleBox, False, False, 0)
         box.pack_start(soundBox, False, False, 0)
         self.show_all()
 
@@ -299,6 +305,7 @@ class NewConvDialog(Gtk.Dialog):
 class LevelWindow(Gtk.Window):
 
     tileMap = ""
+    title = ""
     sound = ""
     num = 0
     doors = []
@@ -334,6 +341,8 @@ class LevelWindow(Gtk.Window):
         self.infoTitle.set_alignment(0, 0)
         self.soundTitle = Gtk.Label("Music")
         self.soundTitle.set_alignment(0, 0)
+        self.titleTitle = Gtk.Label("Music")
+        self.titleTitle.set_alignment(0, 0)
         self.toolbar = Gtk.Toolbar()
         self.toolbar.set_style(Gtk.ToolbarStyle.BOTH_HORIZ)
         self.saveButton = Gtk.ToolButton(stock_id=Gtk.STOCK_SAVE, label="Save")
@@ -413,6 +422,7 @@ class LevelWindow(Gtk.Window):
 
         self.box.pack_start(self.infobox, True, True, 5)
         self.infobox.pack_start(self.infoTitle, False, False, 5)
+        self.infobox.pack_start(self.titleTitle, False, False, 5)
         self.infobox.pack_start(self.soundTitle, False, False, 5)
         self.infobox.pack_start(self.infoscroll, True, True, 2)
         self.infobox.pack_start(self.toolbar, False, False, 0)
@@ -648,11 +658,12 @@ class LevelWindow(Gtk.Window):
                 level = json.loads(line)
                 self.num = i
                 self.tileMap = level[0]
-                self.sound = level[1]
-                self.doors = level[2]
-                self.entities = level[3]
-                self.enemies = level[4]
-                self.interactables = level[5]
+                self.title = level[1]
+                self.sound = level[2]
+                self.doors = level[3]
+                self.entities = level[4]
+                self.enemies = level[5]
+                self.interactables = level[6]
                 break
         fp.close()
         self.rebuild()
@@ -737,6 +748,8 @@ class LevelWindow(Gtk.Window):
     def rebuild(self):
         self.infoTitle.set_text("<span size='25000'><b>tmx/" + self.tileMap + ".tmx</b></span>")
         self.infoTitle.set_use_markup(True)
+        self.titleTitle.set_text("<span size='10000'><b>Name: </b>" + self.title + "</span>")
+        self.titleTitle.set_use_markup(True)
         self.soundTitle.set_text("<span size='10000'><b>Music: </b>" + self.sound + "</span>")
         self.soundTitle.set_use_markup(True)
         doorMod = self.create_door_model()
@@ -765,9 +778,10 @@ class LevelWindow(Gtk.Window):
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             name = dialog.nameEntry.get_text()
+            title = dialog.titleEntry.get_text()
             sound = dialog.soundEntry.get_text()
             fp = open(levelsAddress, 'a')
-            fp.write(json.dumps([name, sound, [], []]) + '\n')
+            fp.write(json.dumps([name, title, sound, [], []]) + '\n')
             fp.close()
             model = self.create_model()
             self.treeView.set_model(model)
@@ -786,7 +800,7 @@ class LevelWindow(Gtk.Window):
         with open(levelsAddress, 'r') as ff:
             data = ff.readlines()
             ff.close()
-        data[lineNo] = json.dumps([self.tileMap, self.sound, self.doors, self.entities, self.enemies, self.interactables]) + '\n'
+        data[lineNo] = json.dumps([self.tileMap, self.title, self.sound, self.doors, self.entities, self.enemies, self.interactables]) + '\n'
         with open(levelsAddress, 'w') as ff:
             ff.writelines(data)
             ff.close()
